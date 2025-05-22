@@ -1,0 +1,11 @@
+# Node
+node_modules/
+.env
+
+# VS Code
+.vscode/
+
+# Build
+client/build/
+client/node_modules/
+client/.env
