@@ -1,0 +1,48 @@
+@import '../../styles/variables';
+
+.dashboard-page {
+  padding: 2rem;
+
+  h2 {
+    color: $primary;
+    font-family: $font-header;
+  }
+
+  .segment-grid {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .segment-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
+    width: 200px;
+
+    h3 {
+      color: $primary;
+    }
+
+    ul {
+      padding-left: 1rem;
+      margin: 0;
+    }
+  }
+
+  table {
+    margin-top: 2rem;
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background: $gray;
+    }
+  }
+}
