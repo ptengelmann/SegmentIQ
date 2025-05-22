@@ -1,22 +1,23 @@
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
+// Remove this line: const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const segmentRoutes = require('./routes/segmentRoutes');
+const insightRoutes = require('./routes/insightRoutes');
 
-// Load environment variables
-dotenv.config();
+// Remove this line: dotenv.config();
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '5mb' })); // 🔧 Increase JSON payload size limit
-app.use(express.urlencoded({ extended: true, limit: '5mb' })); // Optional: support form data
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/segment', segmentRoutes);
+app.use('/api/insight', insightRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
