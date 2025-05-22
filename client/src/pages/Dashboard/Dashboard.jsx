@@ -20,7 +20,20 @@ import {
   ChevronDown,
   ArrowUpRight,
   ArrowDownRight,
-  Zap
+  Zap,
+  Brain,
+  Globe,
+  Shield,
+  Clock,
+  TrendingDown,
+  Star,
+  AlertCircle,
+  CheckCircle,
+  Database,
+  Layers,
+  MoreHorizontal,
+  Play,
+  Pause
 } from 'lucide-react';
 import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
@@ -36,26 +49,35 @@ const Dashboard = () => {
   const [selectedSegment, setSelectedSegment] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const raw = localStorage.getItem('segments');
-  if (!raw) return;
-
-  try {
-    const parsed = JSON.parse(raw);
-    setSegments(parsed.segments || []);
-    setSummary(parsed.summary || '');
-    setDetails(parsed.segment_details || {});
-    setFeatures(parsed.features_used || []);
+    console.log('[Dashboard] Loading data from localStorage:', raw);
     
-    // 🆕 Load pre-generated insights
-    if (parsed.segment_insights) {
-      setGptSummaries(parsed.segment_insights);
+    if (!raw) {
+      setIsLoading(false);
+      return;
     }
-  } catch (err) {
-    console.error('[Dashboard] Error parsing localStorage:', err);
-  }
-}, []);
+
+    try {
+      const parsed = JSON.parse(raw);
+      console.log('[Dashboard] Parsed data:', parsed);
+      
+      setSegments(parsed.segments || []);
+      setSummary(parsed.summary || '');
+      setDetails(parsed.segment_details || {});
+      setFeatures(parsed.features_used || []);
+      
+      if (parsed.segment_insights) {
+        setGptSummaries(parsed.segment_insights);
+      }
+    } catch (err) {
+      console.error('[Dashboard] Error parsing localStorage:', err);
+    }
+    
+    setIsLoading(false);
+  }, []);
 
   const segmentGroups = segments.reduce((acc, row) => {
     const seg = row.segment;
@@ -64,45 +86,34 @@ const Dashboard = () => {
     return acc;
   }, {});
 
-  // In your Dashboard component, modify the generateSummary function:
-const generateSummary = async (segmentId) => {
-  console.log('[Dashboard] Generating summary for segment:', segmentId);
-  
-  // Check if we already have pre-generated insights
-  const preGeneratedInsight = details[`Segment_${segmentId}`]?.insight;
-  if (preGeneratedInsight) {
-    setGptSummaries(prev => ({ ...prev, [segmentId]: preGeneratedInsight }));
-    return;
-  }
-  
-  // If not, call the API
-  const data = segmentGroups[segmentId];
-  if (!data || data.length === 0) return;
+  const generateSummary = async (segmentId) => {
+    const data = segmentGroups[segmentId];
+    if (!data || data.length === 0) return;
 
-  try {
-    setLoadingSeg(segmentId);
-    const token = localStorage.getItem('token');
-    
-    const res = await fetch('http://localhost:5000/api/insight/generate-summary', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ segmentData: data })
-    });
+    try {
+      setLoadingSeg(segmentId);
+      const token = localStorage.getItem('token');
+      
+      const res = await fetch('http://localhost:5000/api/insight/generate-summary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ segmentData: data })
+      });
 
-    const result = await res.json();
-    if (result.summary) {
-      setGptSummaries(prev => ({ ...prev, [segmentId]: result.summary }));
+      const result = await res.json();
+      if (result.summary) {
+        setGptSummaries(prev => ({ ...prev, [segmentId]: result.summary }));
+      }
+    } catch (err) {
+      console.error('[Dashboard] Summary Error:', err);
+      setGptSummaries(prev => ({ ...prev, [segmentId]: 'Analysis temporarily unavailable.' }));
+    } finally {
+      setLoadingSeg(null);
     }
-  } catch (err) {
-    console.error('[Dashboard] Summary Error:', err);
-    setGptSummaries(prev => ({ ...prev, [segmentId]: 'Analysis temporarily unavailable.' }));
-  } finally {
-    setLoadingSeg(null);
-  }
-};
+  };
 
   const exportSegment = (segmentId) => {
     const rows = segmentGroups[segmentId];
@@ -122,140 +133,101 @@ const generateSummary = async (segmentId) => {
   };
 
   const getSegmentMetrics = (segmentId) => {
-  const data = segmentGroups[segmentId];
-  const detailKey = `Segment_${segmentId}`;
-  const info = details[detailKey] || {};
-  
-  if (!data || data.length === 0) {
-    return {
-      totalUsers: 0,
-      percentage: 0,
-      avgValue: 0,
-      growth: 0,
-      engagement: 0
-    };
-  }
-  
-  // Calculate REAL metrics from actual data
-  const totalUsers = data.length;
-  const percentage = info.percentage || 0;
-  
-  // Find numeric fields and calculate real averages
-  const sampleRow = data[0] || {};
-  const numericFields = Object.keys(sampleRow).filter(key => 
-    typeof sampleRow[key] === 'number' && key !== 'segment'
-  );
-  
-  let avgValue = 0;
-  let engagement = 0;
-  
-  if (numericFields.length > 0) {
-    // Use the first numeric field as "value" metric
-    const firstNumericField = numericFields[0];
-    const values = data
-      .map(row => row[firstNumericField])
-      .filter(val => val !== null && val !== undefined && !isNaN(val));
+    const data = segmentGroups[segmentId];
+    const detailKey = `Segment_${segmentId}`;
+    const info = details[detailKey] || {};
     
-    if (values.length > 0) {
-      avgValue = Math.round(values.reduce((sum, val) => sum + val, 0) / values.length);
+    if (!data || data.length === 0) {
+      return {
+        totalUsers: 0,
+        percentage: 0,
+        avgValue: 0,
+        growth: 0,
+        engagement: 0
+      };
     }
     
-    // Use second numeric field for "engagement" if available
-    if (numericFields.length > 1) {
-      const secondField = numericFields[1];
-      const engagementValues = data
-        .map(row => row[secondField])
+    const totalUsers = data.length;
+    const percentage = info.percentage || 0;
+    
+    const sampleRow = data[0] || {};
+    const numericFields = Object.keys(sampleRow).filter(key => 
+      typeof sampleRow[key] === 'number' && key !== 'segment'
+    );
+    
+    let avgValue = 0;
+    let engagement = 0;
+    
+    if (numericFields.length > 0) {
+      const firstNumericField = numericFields[0];
+      const values = data
+        .map(row => row[firstNumericField])
         .filter(val => val !== null && val !== undefined && !isNaN(val));
       
-      if (engagementValues.length > 0) {
-        engagement = Math.round(engagementValues.reduce((sum, val) => sum + val, 0) / engagementValues.length);
+      if (values.length > 0) {
+        avgValue = Math.round(values.reduce((sum, val) => sum + val, 0) / values.length);
+      }
+      
+      if (numericFields.length > 1) {
+        const secondField = numericFields[1];
+        const engagementValues = data
+          .map(row => row[secondField])
+          .filter(val => val !== null && val !== undefined && !isNaN(val));
+        
+        if (engagementValues.length > 0) {
+          engagement = Math.round(engagementValues.reduce((sum, val) => sum + val, 0) / engagementValues.length);
+        }
+      } else {
+        engagement = avgValue > 0 ? Math.min(Math.round((avgValue / 100) * 75), 100) : Math.round(Math.random() * 40 + 40);
       }
     } else {
-      // Calculate engagement as a percentage of average value relative to max
-      engagement = avgValue > 0 ? Math.min(Math.round((avgValue / 100) * 75), 100) : Math.round(Math.random() * 40 + 40);
+      avgValue = Math.round(totalUsers * 45 + 800);
+      engagement = Math.round(Math.min(totalUsers * 0.8 + 20, 95));
     }
-  } else {
-    // Fallback: use segment size to determine metrics
-    avgValue = Math.round(totalUsers * 45 + 800);
-    engagement = Math.round(Math.min(totalUsers * 0.8 + 20, 95));
-  }
-  
-  // Calculate stable growth based on segment characteristics (not random)
-  const growth = totalUsers > 100 ? 
-    Math.round((totalUsers / 10) - 5) : 
-    Math.round((totalUsers / 5) - 8);
-  
-  return {
-    totalUsers,
-    percentage,
-    avgValue,
-    growth: Math.max(-15, Math.min(25, growth)), // Keep growth realistic
-    engagement: Math.max(15, Math.min(100, engagement)),
-    ...info
+    
+    const growth = totalUsers > 100 ? 
+      Math.round((totalUsers / 10) - 5) : 
+      Math.round((totalUsers / 5) - 8);
+    
+    return {
+      totalUsers,
+      percentage,
+      avgValue,
+      growth: Math.max(-15, Math.min(25, growth)),
+      engagement: Math.max(15, Math.min(100, engagement)),
+      ...info
+    };
   };
-};
 
-  const renderOverviewStats = () => {
+  const renderQuickStats = () => {
     const totalCustomers = segments.length;
     const totalSegments = Object.keys(segmentGroups).length;
     const avgSegmentSize = totalSegments > 0 ? Math.round(totalCustomers / totalSegments) : 0;
     
     return (
-      <div className="stats-grid">
-        <div className="stat-card primary">
-          <div className="stat-icon">
-            <Users size={24} />
-          </div>
-          <div className="stat-content">
-            <h3>{totalCustomers.toLocaleString()}</h3>
-            <p>Total Customers</p>
-            <span className="stat-trend positive">
-              <ArrowUpRight size={16} />
-              +12.5%
-            </span>
-          </div>
+      <div className="quick-stats">
+        <div className="stat-item">
+          <div className="stat-value">{totalCustomers.toLocaleString()}</div>
+          <div className="stat-label">Total Customers</div>
+          <div className="stat-change positive">+12.5%</div>
         </div>
         
-        <div className="stat-card accent">
-          <div className="stat-icon">
-            <Target size={24} />
-          </div>
-          <div className="stat-content">
-            <h3>{totalSegments}</h3>
-            <p>Active Segments</p>
-            <span className="stat-trend positive">
-              <ArrowUpRight size={16} />
-              +2 new
-            </span>
-          </div>
+        <div className="stat-item">
+          <div className="stat-value">{totalSegments}</div>
+          <div className="stat-label">Active Segments</div>
+          <div className="stat-change positive">+2 new</div>
         </div>
         
-        <div className="stat-card success">
-          <div className="stat-icon">
-            <TrendingUp size={24} />
-          </div>
-          <div className="stat-content">
-            <h3>{avgSegmentSize}</h3>
-            <p>Avg Segment Size</p>
-            <span className="stat-trend neutral">
-              <Activity size={16} />
-              Stable
-            </span>
-          </div>
+        <div className="stat-item">
+          <div className="stat-value">{avgSegmentSize}</div>
+          <div className="stat-label">Avg Segment Size</div>
+          <div className="stat-change neutral">Stable</div>
         </div>
         
-        <div className="stat-card warning">
-          <div className="stat-icon">
-            <Zap size={24} />
-          </div>
-          <div className="stat-content">
-            <h3>94.2%</h3>
-            <p>Model Accuracy</p>
-            <span className="stat-trend positive">
-              <ArrowUpRight size={16} />
-              +2.1%
-            </span>
-          </div>
+        <div className="stat-item">
+          <div className="stat-value">94.2%</div>
+          <div className="stat-label">ML Accuracy</div>
+          <div className="stat-change positive">+2.1%</div>
         </div>
       </div>
     );
@@ -266,22 +238,22 @@ const generateSummary = async (segmentId) => {
     
     if (segmentIds.length === 0) {
       return (
-        <div className="empty-state">
+        <div className="empty-state-card">
           <div className="empty-icon">
-            <PieChart size={48} />
+            <Target size={32} />
           </div>
           <h3>No Segments Available</h3>
-          <p>Upload customer data to generate intelligent segments</p>
-          <button className="primary-btn">
+          <p>Upload customer data to generate intelligent segments and unlock powerful insights</p>
+          <button className="upload-btn" onClick={() => window.location.href = '/upload'}>
             <Upload size={16} />
-            Upload Data
+            Upload Customer Data
           </button>
         </div>
       );
     }
 
     return (
-      <div className="segments-grid">
+      <div className="segments-container">
         {segmentIds.map((segmentId) => {
           const metrics = getSegmentMetrics(segmentId);
           const isActive = selectedSegment === segmentId;
@@ -292,12 +264,16 @@ const generateSummary = async (segmentId) => {
               key={segmentId}
               onClick={() => setSelectedSegment(selectedSegment === segmentId ? null : segmentId)}
             >
-              <div className="segment-header">
-                <div className="segment-title">
-                  <div className={`segment-indicator segment-${segmentId}`}></div>
-                  <h3>Segment {segmentId}</h3>
+              <div className="card-header">
+                <div className="segment-info">
+                  <div className={`segment-dot segment-${segmentId}`}></div>
+                  <div className="segment-title">
+                    <h4>Segment {segmentId}</h4>
+                    <span className="segment-size">{metrics.totalUsers} customers • {metrics.percentage}%</span>
+                  </div>
                 </div>
-                <div className="segment-actions">
+                
+                <div className="card-actions">
                   <button 
                     className="action-btn"
                     onClick={(e) => {
@@ -308,9 +284,9 @@ const generateSummary = async (segmentId) => {
                     title="Generate AI Insights"
                   >
                     {loadingSeg === segmentId ? (
-                      <RefreshCw size={16} className="spinning" />
+                      <RefreshCw size={14} className="spinning" />
                     ) : (
-                      <Sparkles size={16} />
+                      <Brain size={14} />
                     )}
                   </button>
                   <button 
@@ -319,64 +295,80 @@ const generateSummary = async (segmentId) => {
                       e.stopPropagation();
                       exportSegment(segmentId);
                     }}
-                    title="Export Segment"
+                    title="Export Data"
                   >
-                    <Download size={16} />
+                    <Download size={14} />
+                  </button>
+                  <button className="action-btn">
+                    <MoreHorizontal size={14} />
                   </button>
                 </div>
               </div>
 
-              <div className="segment-metrics">
+              <div className="metrics-grid">
                 <div className="metric">
-                  <Users size={16} />
-                  <span>{metrics.totalUsers.toLocaleString()} users</span>
+                  <div className="metric-icon">
+                    <DollarSign size={16} />
+                  </div>
+                  <div className="metric-content">
+                    <div className="metric-value">${metrics.avgValue.toLocaleString()}</div>
+                    <div className="metric-label">Avg Value</div>
+                  </div>
                 </div>
+                
                 <div className="metric">
-                  <BarChart3 size={16} />
-                  <span>{metrics.percentage}% of total</span>
+                  <div className="metric-icon">
+                    <Activity size={16} />
+                  </div>
+                  <div className="metric-content">
+                    <div className="metric-value">{metrics.engagement}%</div>
+                    <div className="metric-label">Engagement</div>
+                  </div>
                 </div>
+                
                 <div className="metric">
-                  <DollarSign size={16} />
-                  <span>${metrics.avgValue.toLocaleString()} avg value</span>
+                  <div className="metric-icon">
+                    <TrendingUp size={16} />
+                  </div>
+                  <div className="metric-content">
+                    <div className={`metric-value ${metrics.growth >= 0 ? 'positive' : 'negative'}`}>
+                      {metrics.growth >= 0 ? '+' : ''}{metrics.growth}%
+                    </div>
+                    <div className="metric-label">Growth</div>
+                  </div>
                 </div>
+                
                 <div className="metric">
-                  <Activity size={16} />
-                  <span>{metrics.engagement}% engagement</span>
+                  <div className="metric-icon">
+                    <Star size={16} />
+                  </div>
+                  <div className="metric-content">
+                    <div className="metric-value">A+</div>
+                    <div className="metric-label">Quality</div>
+                  </div>
                 </div>
-              </div>
-
-              <div className="segment-growth">
-                <span className={`growth-indicator ${metrics.growth >= 0 ? 'positive' : 'negative'}`}>
-                  {metrics.growth >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                  {Math.abs(metrics.growth)}% growth
-                </span>
               </div>
 
               {gptSummaries[segmentId] && (
-                <div className="ai-insight">
-                  <div className="insight-header">
+                <div className="ai-insights">
+                  <div className="insights-header">
                     <Sparkles size={14} />
-                    <span>AI Insights</span>
+                    <span>AI Analysis</span>
                   </div>
-                  <p>{gptSummaries[segmentId]}</p>
+                  <p className="insights-text">{gptSummaries[segmentId]}</p>
                 </div>
               )}
 
               {isActive && (
-                <div className="segment-details">
-                  <div className="details-header">
-                    <h4>Segment Analysis</h4>
-                  </div>
-                  <div className="details-content">
-                    {Object.entries(metrics).map(([key, val]) =>
-                      key.startsWith('avg_') ? (
-                        <div key={key} className="detail-item">
-                          <span className="detail-label">{key.replace('avg_', '').replace('_', ' ')}</span>
-                          <span className="detail-value">{val}</span>
-                        </div>
-                      ) : null
-                    )}
-                  </div>
+                <div className="segment-actions">
+                  <button className="primary-action">
+                    <Play size={14} />
+                    Launch Campaign
+                  </button>
+                  <button className="secondary-action">
+                    <Eye size={14} />
+                    View Details
+                  </button>
                 </div>
               )}
             </div>
@@ -402,15 +394,16 @@ const generateSummary = async (segmentId) => {
     });
 
     return (
-      <div className="data-section">
-        <div className="data-header">
-          <div className="data-title">
-            <BarChart3 size={20} />
-            <h3>Customer Data Analysis</h3>
+      <div className="data-table-container">
+        <div className="table-header">
+          <div className="table-title">
+            <Database size={20} />
+            <h3>Customer Data</h3>
+            <span className="record-count">{filteredSegments.length.toLocaleString()} records</span>
           </div>
           
-          <div className="data-controls">
-            <div className="search-box">
+          <div className="table-controls">
+            <div className="search-input">
               <Search size={16} />
               <input
                 type="text"
@@ -420,29 +413,27 @@ const generateSummary = async (segmentId) => {
               />
             </div>
             
-            <div className="filter-dropdown">
-              <select 
-                value={filterType} 
-                onChange={(e) => setFilterType(e.target.value)}
-              >
-                <option value="all">All Segments</option>
-                {Object.keys(segmentGroups).map(id => (
-                  <option key={id} value={id}>Segment {id}</option>
-                ))}
-              </select>
-              <ChevronDown size={16} />
-            </div>
+            <select 
+              value={filterType} 
+              onChange={(e) => setFilterType(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Segments</option>
+              {Object.keys(segmentGroups).map(id => (
+                <option key={id} value={id}>Segment {id}</option>
+              ))}
+            </select>
           </div>
         </div>
 
-        <div className="table-container">
+        <div className="table-wrapper">
           <table className="data-table">
             <thead>
               <tr>
                 {segments[0] && Object.keys(segments[0]).map((col) => (
                   <th key={col}>
-                    <div className="th-content">
-                      {col.replace('_', ' ').toUpperCase()}
+                    <div className="header-content">
+                      <span>{col.replace('_', ' ').toUpperCase()}</span>
                       <Filter size={12} />
                     </div>
                   </th>
@@ -451,15 +442,15 @@ const generateSummary = async (segmentId) => {
             </thead>
             <tbody>
               {filteredSegments.slice(0, 50).map((row, i) => (
-                <tr key={i} className={`segment-row-${row.segment}`}>
+                <tr key={i} className={`row-segment-${row.segment}`}>
                   {Object.values(row).map((val, j) => (
                     <td key={j}>
                       {j === Object.values(row).length - 1 ? (
-                        <span className={`segment-badge segment-${val}`}>
+                        <span className={`segment-tag segment-${val}`}>
                           Segment {val}
                         </span>
                       ) : (
-                        String(val)
+                        <span className="cell-value">{String(val)}</span>
                       )}
                     </td>
                   ))}
@@ -469,9 +460,9 @@ const generateSummary = async (segmentId) => {
           </table>
           
           {filteredSegments.length > 50 && (
-            <div className="table-footer">
-              <p>Showing 50 of {filteredSegments.length} customers</p>
-              <button className="load-more-btn">Load More</button>
+            <div className="table-pagination">
+              <span>Showing 50 of {filteredSegments.length} records</span>
+              <button className="load-more">Load More</button>
             </div>
           )}
         </div>
@@ -479,85 +470,114 @@ const generateSummary = async (segmentId) => {
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className="dashboard-loading">
+        <div className="loading-spinner">
+          <RefreshCw size={24} className="spinning" />
+        </div>
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
+    <div className="dashboard-page">
+      {/* Page Header */}
+      <div className="page-header">
         <div className="header-content">
-          <div className="header-title">
-            <PieChart size={32} />
-            <div>
-              <h1>Customer Intelligence Dashboard</h1>
-              <p>Advanced segmentation and behavioral analytics</p>
-            </div>
+          <div className="page-title">
+            <h1>Dashboard</h1>
+            <p>Real-time customer intelligence and segmentation analytics</p>
           </div>
           
           <div className="header-actions">
-            <button className="secondary-btn">
+            <button className="btn-secondary">
               <Calendar size={16} />
               Export Report
             </button>
-            <button className="primary-btn">
+            <button className="btn-primary">
               <Settings size={16} />
               Configure
             </button>
           </div>
         </div>
         
-        <div className="nav-tabs">
+        {/* Quick Stats Bar */}
+        {renderQuickStats()}
+      </div>
+
+      {/* Main Content */}
+      <div className="dashboard-content">
+        {summary && (
+          <div className="summary-banner">
+            <div className="banner-icon">
+              <Brain size={20} />
+            </div>
+            <div className="banner-content">
+              <h3>Analysis Summary</h3>
+              <p>{summary}</p>
+            </div>
+            <div className="banner-status">
+              <CheckCircle size={16} />
+              <span>Complete</span>
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Tabs */}
+        <div className="content-tabs">
           <button 
-            className={`nav-tab ${activeView === 'overview' ? 'active' : ''}`}
+            className={`tab ${activeView === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveView('overview')}
           >
             <Eye size={16} />
             Overview
           </button>
           <button 
-            className={`nav-tab ${activeView === 'segments' ? 'active' : ''}`}
+            className={`tab ${activeView === 'segments' ? 'active' : ''}`}
             onClick={() => setActiveView('segments')}
           >
             <Target size={16} />
             Segments
           </button>
           <button 
-            className={`nav-tab ${activeView === 'data' ? 'active' : ''}`}
+            className={`tab ${activeView === 'data' ? 'active' : ''}`}
             onClick={() => setActiveView('data')}
           >
-            <BarChart3 size={16} />
+            <Database size={16} />
             Data
           </button>
         </div>
-      </div>
 
-      <div className="dashboard-content">
-        {summary && (
-          <div className="insights-banner">
-            <div className="banner-icon">
-              <Sparkles size={20} />
-            </div>
-            <div className="banner-content">
-              <h3>Analysis Summary</h3>
-              <p>{summary}</p>
-            </div>
-          </div>
-        )}
-
-        {activeView === 'overview' && (
-          <div className="overview-section">
-            {renderOverviewStats()}
-            <div className="quick-segments">
-              <h3>Segment Performance</h3>
+        {/* Tab Content */}
+        <div className="tab-content">
+          {activeView === 'overview' && (
+            <div className="overview-content">
+              <div className="section-header">
+                <h2>Customer Segments</h2>
+                <p>AI-powered behavioral analysis and targeting recommendations</p>
+              </div>
               {renderSegmentCards()}
             </div>
-          </div>
-        )}
+          )}
 
-        {activeView === 'segments' && (
-          <div className="segments-section">
-            {renderSegmentCards()}
-          </div>
-        )}
+          {activeView === 'segments' && (
+            <div className="segments-content">
+              <div className="section-header">
+                <h2>Segment Management</h2>
+                <p>Detailed view of all customer segments and their characteristics</p>
+              </div>
+              {renderSegmentCards()}
+            </div>
+          )}
 
-        {activeView === 'data' && renderDataTable()}
+          {activeView === 'data' && (
+            <div className="data-content">
+              {renderDataTable()}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
