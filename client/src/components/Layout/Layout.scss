@@ -1,0 +1,56 @@
+@import '../../styles/variables';
+
+.app-layout {
+  min-height: 100vh;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: $dark;
+  padding: 1rem 2rem;
+  color: white;
+
+  .logo a {
+    font-family: $font-header;
+    font-size: 1.3rem;
+    color: white;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+
+    a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    button {
+      background: none;
+      border: none;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.app-content {
+  padding: 2rem;
+}
