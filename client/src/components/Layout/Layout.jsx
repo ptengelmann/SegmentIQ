@@ -224,7 +224,7 @@ const Layout = () => {
                   </div>
                   
                   <div className="dropdown-menu">
-                    <Link to="/profile" className="dropdown-item">
+                    <Link to="/settings" className="dropdown-item">
                       <User size={16} />
                       Profile Settings
                     </Link>
