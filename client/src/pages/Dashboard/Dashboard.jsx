@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '../../hooks/useAuth'; // 🆕 Add this import
 import './Dashboard.scss';
 import { 
   PieChart, 
@@ -39,6 +40,8 @@ import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
 
 const Dashboard = () => {
+    useAuth(); // 🆕 Add this hook at the top
+
   const [segments, setSegments] = useState([]);
   const [summary, setSummary] = useState('');
   const [details, setDetails] = useState({});

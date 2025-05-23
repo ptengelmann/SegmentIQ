@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchSegmentHistory } from '../../services/segmentService';
+import { useAuth } from '../../hooks/useAuth'; // 🆕 Add this import
 import './Settings.scss';
 import {
   Settings as SettingsIcon,
@@ -39,6 +40,7 @@ import {
 } from 'lucide-react';
 
 const Settings = () => {
+    useAuth(); // 🆕 Add this hook at the top
   const [history, setHistory] = useState([]);
   const [activeTab, setActiveTab] = useState('profile');
   const [isLoading, setIsLoading] = useState(false);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth'; // 🆕 Add this import
 import './Layout.scss';
 import { 
   PieChart, 
@@ -21,6 +22,8 @@ import {
 } from 'lucide-react';
 
 const Layout = () => {
+      useAuth(); // 🆕 Add this hook at the top
+
   const navigate = useNavigate();
   const location = useLocation();
   const token = localStorage.getItem('token');
