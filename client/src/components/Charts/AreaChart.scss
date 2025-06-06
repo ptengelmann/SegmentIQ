@@ -1,0 +1,59 @@
+// components/Charts/AreaChart.scss
+@import '../../styles/variables';
+
+.area-chart-container {
+  position: relative;
+  width: 100%;
+  
+  svg {
+    overflow: visible;
+    
+    .line {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    
+    .data-point {
+      cursor: pointer;
+      transition: r 0.2s ease;
+    }
+    
+    .data-point-hover {
+      cursor: pointer;
+    }
+    
+    .x-axis, .y-axis {
+      path, line {
+        stroke: $gray-200;
+      }
+      
+      text {
+        fill: $gray-500;
+      }
+    }
+  }
+  
+  .chart-tooltip {
+    position: absolute;
+    visibility: hidden;
+    background: white;
+    border: 1px solid $gray-200;
+    border-radius: $border-radius;
+    padding: $spacing-2 $spacing-3;
+    box-shadow: $shadow-md;
+    pointer-events: none;
+    z-index: 10;
+    
+    .tooltip-date {
+      font-size: $text-xs;
+      color: $gray-500;
+      margin-bottom: $spacing-1;
+    }
+    
+    .tooltip-value {
+      font-size: $text-sm;
+      font-weight: 600;
+      color: $gray-900;
+    }
+  }
+}

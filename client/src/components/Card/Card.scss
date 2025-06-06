@@ -1,0 +1,95 @@
+// components/Card/Card.scss
+@import '../../styles/variables';
+
+.card {
+  background: white;
+  border-radius: $border-radius-lg;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  transition: transform $transition-normal, box-shadow $transition-normal;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+  
+  &__header {
+    padding: $spacing-6;
+    border-bottom: 1px solid $gray-200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    &-title {
+      display: flex;
+      align-items: center;
+      gap: $spacing-3;
+      
+      h3 {
+        margin: 0;
+        font-size: $text-lg;
+        font-weight: 600;
+        color: $gray-900;
+      }
+      
+      .subtitle {
+        font-size: $text-sm;
+        color: $gray-500;
+        margin-top: $spacing-1;
+      }
+    }
+    
+    &-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: $primary-ultralight;
+      color: $primary;
+      border-radius: $border-radius;
+    }
+    
+    &-actions {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+    }
+  }
+  
+  &__content {
+    padding: $spacing-6;
+  }
+  
+  &__footer {
+    padding: $spacing-4 $spacing-6;
+    border-top: 1px solid $gray-200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  // Variations
+  &--primary {
+    border-top: 3px solid $primary;
+  }
+  
+  &--accent {
+    border-top: 3px solid $accent;
+  }
+  
+  &--compact {
+    .card__header {
+      padding: $spacing-4;
+    }
+    
+    .card__content {
+      padding: $spacing-4;
+    }
+    
+    .card__footer {
+      padding: $spacing-3 $spacing-4;
+    }
+  }
+}
