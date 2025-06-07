@@ -1,0 +1,94 @@
+@import './styles/variables';
+
+.appContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: $background-color;
+}
+
+.header {
+  background-color: white;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.branding {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.tagline {
+  font-size: 0.875rem;
+  color: $text-light;
+  margin: 0;
+}
+
+.mainNav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navLink, .navLinkActive {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  color: $text-light;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $primary-color;
+  }
+}
+
+.navLinkActive {
+  color: $primary-color;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: $primary-color;
+  }
+}
+
+.mainContent {
+  flex: 1;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+  }
+  
+  .branding {
+    margin-bottom: 0;
+  }
+  
+  .mainContent {
+    padding: 1.5rem;
+  }
+}

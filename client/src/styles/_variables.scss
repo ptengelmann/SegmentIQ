@@ -1,0 +1,44 @@
+// src/styles/variables.scss
+
+// Colors
+$primary-color: #0070f3;
+$secondary-color: #f5f5f5;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$text-color: #333;
+$text-light: #6b7280;
+$border-color: #e5e7eb;
+$background-color: #f9fafb;
+
+// Spacing
+$padding-xs: 0.25rem;
+$padding-sm: 0.5rem;
+$padding-md: 1rem;
+$padding-lg: 2rem;
+$padding-xl: 3rem;
+
+// Typography
+$font-main: 'Inter', 'Segoe UI', sans-serif;
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-md: 1rem;
+$font-size-lg: 1.25rem;
+$font-size-xl: 1.5rem;
+$font-size-2xl: 2rem;
+
+// Shadows
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+// Border radius
+$border-radius-sm: 0.25rem;
+$border-radius-md: 0.5rem;
+$border-radius-lg: 1rem;
+$border-radius-full: 9999px;
+
+// Transitions
+$transition-fast: 150ms ease-in-out;
+$transition-normal: 300ms ease-in-out;
+$transition-slow: 500ms ease-in-out;
