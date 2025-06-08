@@ -1,94 +1,749 @@
+// Import variables from external file
 @import './styles/variables';
 
+// Variables
+$sidebar-width-expanded: 260px;
+$sidebar-width-collapsed: 70px;
+$transition-duration: 0.3s;
+$transition-timing: cubic-bezier(0.4, 0.0, 0.2, 1);
+
+// Color Palette
+$color-background: #0a0e17;
+$color-surface: #131827;
+$color-surface-alt: #1a2035;
+$color-primary: #7b61ff;
+$color-primary-light: #9a85ff;
+$color-primary-dark: #5a3ff0;
+$color-accent: #06d6a0;
+$color-text-primary: rgba(255, 255, 255, 0.95);
+$color-text-secondary: rgba(255, 255, 255, 0.65);
+$color-text-tertiary: rgba(255, 255, 255, 0.45);
+$color-border: rgba(255, 255, 255, 0.08);
+$color-glow: rgba(123, 97, 255, 0.3);
+$color-error: #ff5a5a;
+$color-success: #1ce8b5;
+$color-warning: #ffaa5a;
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+$gradient-accent: linear-gradient(135deg, $color-accent 0%, #04b58b 100%);
+$gradient-surface: linear-gradient(135deg, rgba(26, 32, 53, 0.7) 0%, rgba(17, 22, 38, 0.7) 100%);
+$gradient-glass: linear-gradient(
+  135deg,
+  rgba(255, 255, 255, 0.05) 0%,
+  rgba(255, 255, 255, 0.02) 100%
+);
+
+// Shadows
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+$shadow-primary: 0 0 16px rgba($color-primary, 0.3);
+$shadow-accent: 0 0 16px rgba($color-accent, 0.3);
+
+// Radius
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 20px;
+$radius-full: 9999px;
+
+// Z-indices
+$z-overlay: 50;
+$z-sidebar: 100;
+$z-hamburger: 110;
+$z-tooltip: 200;
+
+// App Container
 .appContainer {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  background-color: $background-color;
+  background-color: $color-background;
+  position: relative;
+  color: $color-text-primary;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
 }
 
-.header {
-  background-color: white;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid $border-color;
+// Sidebar
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: $sidebar-width-expanded;
+  background: $color-surface;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.branding {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #333;
-  margin: 0;
-}
-
-.tagline {
-  font-size: 0.875rem;
-  color: $text-light;
-  margin: 0;
-}
-
-.mainNav {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.navLink, .navLinkActive {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-  color: $text-light;
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: $primary-color;
+  z-index: $z-sidebar;
+  transition: width $transition-duration $transition-timing, transform $transition-duration $transition-timing;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border-right: 1px solid $color-border;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: $gradient-glass;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  
+  &.collapsed {
+    width: $sidebar-width-collapsed;
+  }
+  
+  &.mobile {
+    transform: translateX(-100%);
+    width: 85%;
+    max-width: 300px;
+  }
+  
+  &.mobileOpen {
+    transform: translateX(0);
   }
 }
 
-.navLinkActive {
-  color: $primary-color;
+// Sidebar Header
+.sidebarHeader {
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid $color-border;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoIconWrapper {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-full;
+  background: $gradient-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: white;
+  box-shadow: $shadow-primary;
+  position: relative;
+  overflow: hidden;
   
   &::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
-    right: 0;
-    height: 2px;
-    background-color: $primary-color;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 60%);
   }
 }
 
-.mainContent {
-  flex: 1;
-  padding: 1rem;
+.logoText {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right, $color-text-primary, $color-primary-light);
+  background-clip: text;
+  -webkit-background-clip: text;
+  transition: opacity $transition-duration $transition-timing, transform $transition-duration $transition-timing;
 }
 
-@media (min-width: 768px) {
-  .header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
+// For the toggle button in collapsed state
+.toggleButton {
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-full;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: $color-text-secondary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $color-text-primary;
   }
   
-  .branding {
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($color-primary, 0.4);
+  }
+  
+  // Make sure the toggle button is visible in collapsed state
+  .collapsed & {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// Adjust the sidebar header for collapsed state
+.sidebarHeader {
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid $color-border;
+  
+  .collapsed & {
+    padding: 1.5rem 0.5rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+// Search container
+.searchContainer {
+  padding: 1rem 1.25rem;
+  position: relative;
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: $radius-full;
+  border: 1px solid $color-border;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
+  
+  &:focus-within {
+    border-color: rgba($color-primary, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 1px rgba($color-primary, 0.2);
+  }
+}
+
+.searchIcon {
+  color: $color-text-tertiary;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  color: $color-text-primary;
+  font-size: 0.875rem;
+  width: 100%;
+  padding: 0;
+  transition: opacity $transition-duration $transition-timing, width $transition-duration $transition-timing;
+  
+  &:focus {
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: $color-text-tertiary;
+  }
+}
+
+// Navigation sections
+.sidebarNav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: $radius-full;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.navSection {
+  margin-bottom: 1.5rem;
+  
+  &:last-child {
     margin-bottom: 0;
   }
+}
+
+.sectionTitle {
+  padding: 0 1.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $color-text-tertiary;
+  transition: opacity $transition-duration $transition-timing, transform $transition-duration $transition-timing;
+}
+
+// Nav items
+.navItemContainer {
+  position: relative;
+  margin: 0.25rem 0;
   
+  &.active {
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 60%;
+      width: 3px;
+      background: $gradient-primary;
+      border-radius: 0 $radius-sm $radius-sm 0;
+      opacity: 0.8;
+    }
+  }
+}
+
+.navLink {
+  display: block;
+  text-decoration: none;
+  position: relative;
+  
+  &:focus {
+    outline: none;
+  }
+}
+
+.navLinkContent {
+  padding: 0.625rem 1.25rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.iconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.navIcon {
+  color: $color-text-secondary;
+  transition: all 0.2s ease;
+  z-index: 1;
+  
+  &.activeIcon {
+    color: $color-primary-light;
+  }
+}
+
+.iconGlow {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-full;
+  background: $color-glow;
+  opacity: 0.7;
+  filter: blur(8px);
+  z-index: 0;
+  animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  70% {
+    transform: scale(1.05);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+}
+
+.navLabel {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: $color-text-secondary;
+  white-space: nowrap;
+  transition: opacity $transition-duration $transition-timing, transform $transition-duration $transition-timing;
+  
+  .active & {
+    color: $color-text-primary;
+    font-weight: 600;
+  }
+}
+
+.subMenuIcon {
+  margin-left: auto;
+  color: $color-text-tertiary;
+  transition: transform 0.2s ease;
+  
+  &.rotated {
+    transform: rotate(90deg);
+  }
+}
+
+// Tooltip
+.tooltip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: $color-surface-alt;
+  padding: 0.5rem 0.75rem;
+  border-radius: $radius-md;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  color: $color-text-primary;
+  box-shadow: $shadow-md;
+  z-index: $z-tooltip;
+  pointer-events: none;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: $color-surface-alt;
+  }
+}
+
+// Submenu
+.subMenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding-left: 2.5rem;
+  
+  &.open {
+    max-height: 200px;
+  }
+}
+
+.subNavLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: $color-text-tertiary;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-radius: $radius-sm;
+  margin: 0.125rem 0;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: $color-text-secondary;
+  }
+  
+  &.activeSubNav {
+    color: $color-primary-light;
+    background: rgba($color-primary, 0.1);
+  }
+}
+
+.subNavDot {
+  width: 4px;
+  height: 4px;
+  border-radius: $radius-full;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+// Sidebar footer
+.sidebarFooter {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid $color-border;
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatarWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-full;
+  background: $gradient-accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 500;
+  font-size: 0.875rem;
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 60%);
+  }
+}
+
+.userInfo {
+  overflow: hidden;
+}
+
+.userName {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: $color-text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userRole {
+  font-size: 0.75rem;
+  color: $color-text-tertiary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Utility classes for transitions
+.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.hidden {
+  opacity: 0;
+  transform: translateX(-10px);
+  pointer-events: none;
+}
+
+// Main content
+.mainContent {
+  flex: 1;
+  margin-left: $sidebar-width-collapsed;
+  transition: margin-left $transition-duration $transition-timing;
+  min-height: 100vh;
+  width: calc(100% - #{$sidebar-width-collapsed});
+  
+  &.shifted {
+    margin-left: $sidebar-width-expanded;
+    width: calc(100% - #{$sidebar-width-expanded});
+  }
+}
+
+.contentWrapper {
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+// Placeholder for pages
+.placeholderPage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 4rem);
+  font-size: 1.5rem;
+  color: $color-text-secondary;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: $radius-lg;
+  border: 1px dashed $color-border;
+}
+
+// Mobile menu button
+.hamburgerMenu {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-full;
+  background: rgba($color-surface, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid $color-border;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  z-index: $z-hamburger;
+  box-shadow: $shadow-md;
+  
+  span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background-color: $color-text-primary;
+    border-radius: $radius-full;
+    transition: all 0.3s ease;
+  }
+  
+  &.active {
+    span {
+      &:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      
+      &:nth-child(2) {
+        opacity: 0;
+      }
+      
+      &:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+    }
+  }
+}
+
+// Overlay for mobile
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: $z-overlay;
+}
+
+// Media queries
+@media (max-width: 767px) {
   .mainContent {
+    margin-left: 0;
+    width: 100%;
+    
+    &.shifted {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+  
+  .contentWrapper {
     padding: 1.5rem;
   }
+}
+
+// Enhanced tooltip styles for submenu display
+.tooltip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: $color-surface-alt;
+  padding: 0.5rem 0.75rem;
+  border-radius: $radius-md;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  color: $color-text-primary;
+  box-shadow: $shadow-md;
+  z-index: $z-tooltip;
+  pointer-events: none;
+  min-width: 120px;
+  
+  &.withSubmenu {
+    padding: 0.5rem 0;
+    pointer-events: auto; // Allow clicking on submenu items
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: $color-surface-alt;
+  }
+}
+
+.tooltipLabel {
+  padding: 0.25rem 0.75rem;
+  font-weight: 500;
+}
+
+.tooltipSubmenu {
+  margin-top: 0.25rem;
+  border-top: 1px solid $color-border;
+  padding-top: 0.25rem;
+}
+
+.tooltipSubmenuItem {
+  display: block;
+  padding: 0.375rem 0.75rem;
+  color: $color-text-secondary;
+  text-decoration: none;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $color-text-primary;
+  }
+  
+  &.activeTooltipSubmenuItem {
+    color: $color-primary-light;
+    background: rgba($color-primary, 0.1);
+  }
+}
+
+// Visual indicator for items with submenus
+.subMenuIndicator {
+  position: absolute;
+  right: 8px;
+  width: 4px;
+  height: 4px;
+  border-radius: $radius-full;
+  background-color: $color-text-tertiary;
 }
