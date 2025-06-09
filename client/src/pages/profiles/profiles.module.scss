@@ -1,0 +1,797 @@
+// pages/profiles/profiles.module.scss
+@import '../../styles/variables';
+
+// Color variables to match your theme
+$color-background: #0a0e17;
+$color-surface: #131827;
+$color-surface-alt: #1a2035;
+$color-surface-card: rgba(26, 32, 53, 0.7);
+$color-primary: #7b61ff;
+$color-primary-light: #9a85ff;
+$color-primary-dark: #5a3ff0;
+$color-accent: #06d6a0;
+$color-text-primary: rgba(255, 255, 255, 0.95);
+$color-text-secondary: rgba(255, 255, 255, 0.65);
+$color-text-tertiary: rgba(255, 255, 255, 0.45);
+$color-border: rgba(255, 255, 255, 0.08);
+$color-success: #1ce8b5;
+$color-warning: #ffaa5a;
+$color-error: #ff5a5a;
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+$gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+// Shadows
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+
+$border-radius: 12px;
+$transition-duration: 0.3s;
+$transition-timing: cubic-bezier(0.4, 0.0, 0.2, 1);
+
+// Main Container
+.profilesContainer {
+  min-height: 100vh;
+  color: $color-text-primary;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+// Page Header
+.pageHeader {
+  margin-bottom: 24px;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.iconWrapper {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba($color-primary, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-primary;
+}
+
+.iconGlow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: rgba($color-primary, 0.15);
+  filter: blur(8px);
+  z-index: 0;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  background: linear-gradient(90deg, $color-text-primary, $color-primary-light);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pageDescription {
+  font-size: 14px;
+  color: $color-text-secondary;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.refreshButton, .bulkDeleteButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-duration ease;
+  font-family: inherit;
+}
+
+.refreshButton {
+  background: rgba($color-surface-alt, 0.8);
+  border: 1px solid $color-border;
+  color: $color-text-secondary;
+  
+  &:hover {
+    background: rgba($color-surface-alt, 1);
+    color: $color-text-primary;
+    border-color: rgba($color-primary, 0.3);
+  }
+}
+
+.bulkDeleteButton {
+  background: rgba($color-error, 0.1);
+  border: 1px solid rgba($color-error, 0.3);
+  color: $color-error;
+  
+  &:hover {
+    background: rgba($color-error, 0.2);
+    border-color: rgba($color-error, 0.5);
+  }
+}
+
+// Filters Section
+.filtersSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.searchContainer {
+  flex: 1;
+  max-width: 400px;
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: $color-surface-card;
+  border: 1px solid $color-border;
+  border-radius: $border-radius;
+  padding: 12px 16px;
+  transition: all $transition-duration ease;
+  
+  &:focus-within {
+    border-color: rgba($color-primary, 0.4);
+    box-shadow: 0 0 0 1px rgba($color-primary, 0.2);
+  }
+}
+
+.searchIcon {
+  color: $color-text-tertiary;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  color: $color-text-primary;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+  font-family: inherit;
+  
+  &::placeholder {
+    color: $color-text-tertiary;
+  }
+}
+
+.filterActions {
+  display: flex;
+  gap: 12px;
+}
+
+.filterButton, .exportButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: $color-surface-card;
+  border: 1px solid $color-border;
+  border-radius: 8px;
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all $transition-duration ease;
+  font-family: inherit;
+  
+  &:hover {
+    background: rgba($color-surface-card, 0.8);
+    color: $color-text-primary;
+    border-color: rgba($color-primary, 0.3);
+  }
+}
+
+// Stats Grid
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: $color-surface-card;
+  border-radius: $border-radius;
+  padding: 20px;
+  border: 1px solid $color-border;
+  backdrop-filter: blur(10px);
+  transition: all $transition-duration ease;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: $gradient-glass;
+    z-index: -1;
+    opacity: 0.5;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.statHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.statTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text-secondary;
+  margin: 0;
+}
+
+.statIcon {
+  color: $color-primary;
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: 8px;
+}
+
+.statFooter {
+  display: flex;
+  align-items: center;
+}
+
+.statChange {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: $color-text-tertiary;
+  
+  svg {
+    color: $color-success;
+  }
+}
+
+// Main Content
+.mainContent {
+  background: $color-surface-card;
+  border-radius: $border-radius;
+  border: 1px solid $color-border;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: $gradient-glass;
+    z-index: -1;
+    opacity: 0.5;
+  }
+}
+
+// Error Alert
+.errorAlert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba($color-error, 0.1);
+  border: 1px solid rgba($color-error, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px;
+  color: $color-error;
+  font-size: 14px;
+}
+
+// Loading
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: $color-text-secondary;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba($color-primary, 0.2);
+  border-top-color: $color-primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Table Container
+.tableContainer {
+  overflow-x: auto;
+  
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+}
+
+.profilesTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+.tableHeader {
+  background: rgba(255, 255, 255, 0.02);
+  
+  th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: $color-text-secondary;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid $color-border;
+    white-space: nowrap;
+  }
+}
+
+.sortableHeader {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: color $transition-duration ease;
+  
+  &:hover {
+    color: $color-text-primary;
+  }
+}
+
+.sortIndicator {
+  margin-left: 8px;
+  color: $color-primary;
+  font-weight: bold;
+}
+
+.tableRow {
+  transition: background-color $transition-duration ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  &.selected {
+    background: rgba($color-primary, 0.05);
+  }
+  
+  td {
+    padding: 16px;
+    border-bottom: 1px solid rgba($color-border, 0.5);
+    vertical-align: middle;
+  }
+}
+
+// Table Cells
+.checkboxCell {
+  width: 48px;
+  text-align: center;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: $color-primary;
+  cursor: pointer;
+}
+
+.nameCell {
+  min-width: 200px;
+}
+
+.profileInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profileAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $gradient-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.profileName {
+  font-weight: 500;
+  color: $color-text-primary;
+}
+
+.emailCell {
+  color: $color-text-secondary;
+  min-width: 200px;
+}
+
+.dateCell {
+  min-width: 120px;
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $color-text-tertiary;
+  font-size: 13px;
+}
+
+.segmentsCell {
+  min-width: 150px;
+}
+
+.segmentBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.segmentBadge {
+  background: rgba($color-accent, 0.1);
+  color: $color-accent;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.noSegments {
+  color: $color-text-tertiary;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.actionsCell {
+  width: 100px;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.viewButton, .deleteButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all $transition-duration ease;
+}
+
+.viewButton {
+  background: rgba($color-primary, 0.1);
+  color: $color-primary;
+  
+  &:hover {
+    background: rgba($color-primary, 0.2);
+  }
+}
+
+.deleteButton {
+  background: rgba($color-error, 0.1);
+  color: $color-error;
+  
+  &:hover {
+    background: rgba($color-error, 0.2);
+  }
+}
+
+// Pagination
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-top: 1px solid $color-border;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.paginationInfo {
+  font-size: 14px;
+  color: $color-text-secondary;
+}
+
+.paginationControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pageButton {
+  padding: 8px 12px;
+  border: 1px solid $color-border;
+  background: $color-surface-card;
+  color: $color-text-secondary;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all $transition-duration ease;
+  font-size: 14px;
+  font-family: inherit;
+  
+  &:hover:not(:disabled) {
+    background: rgba($color-primary, 0.1);
+    color: $color-text-primary;
+    border-color: rgba($color-primary, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &.active {
+    background: $color-primary;
+    color: white;
+    border-color: $color-primary;
+  }
+}
+
+// Modal Styles
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.deleteModal {
+  background: $color-surface;
+  border-radius: $border-radius;
+  border: 1px solid $color-border;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: $shadow-lg;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 20px 16px;
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin: 0;
+  }
+}
+
+.warningIcon {
+  color: $color-warning;
+  flex-shrink: 0;
+}
+
+.modalBody {
+  padding: 0 20px 20px;
+  
+  p {
+    color: $color-text-secondary;
+    margin: 0 0 16px;
+    line-height: 1.5;
+  }
+}
+
+.profilePreview {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  
+  strong {
+    color: $color-text-primary;
+  }
+  
+  span {
+    color: $color-text-tertiary;
+    font-size: 13px;
+  }
+}
+
+.warningText {
+  color: $color-warning;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px 20px;
+  justify-content: flex-end;
+}
+
+.cancelButton, .confirmDeleteButton {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-duration ease;
+  font-family: inherit;
+}
+
+.cancelButton {
+  background: rgba(255, 255, 255, 0.05);
+  color: $color-text-secondary;
+  border: 1px solid $color-border;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: $color-text-primary;
+  }
+}
+
+.confirmDeleteButton {
+  background: $color-error;
+  color: white;
+  
+  &:hover {
+    background: darken($color-error, 10%);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filtersSection {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .searchContainer {
+    max-width: none;
+  }
+  
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .paginationControls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .profilesTable {
+    font-size: 12px;
+    
+    th, td {
+      padding: 12px 8px;
+    }
+  }
+  
+  .nameCell, .emailCell {
+    min-width: 150px;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalOverlay {
+    padding: 16px;
+  }
+  
+  .deleteModal {
+    max-width: none;
+  }
+  
+  .modalActions {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}

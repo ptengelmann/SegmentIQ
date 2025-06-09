@@ -1,0 +1,1635 @@
+// pages/segments/SegmentsList.module.scss
+@import '../../styles/variables';
+
+// Color variables to match the app theme
+$color-background: #0a0e17;
+$color-surface: #131827;
+$color-surface-alt: #1a2035;
+$color-surface-card: rgba(26, 32, 53, 0.7);
+$color-primary: #7b61ff;
+$color-primary-light: #9a85ff;
+$color-primary-dark: #5a3ff0;
+$color-accent: #06d6a0;
+$color-accent-light: #0ceeb1;
+$color-text-primary: rgba(255, 255, 255, 0.95);
+$color-text-secondary: rgba(255, 255, 255, 0.65);
+$color-text-tertiary: rgba(255, 255, 255, 0.45);
+$color-border: rgba(255, 255, 255, 0.08);
+$color-success: #1ce8b5;
+$color-warning: #ffaa5a;
+$color-error: #ff5a5a;
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+$gradient-accent: linear-gradient(135deg, $color-accent 0%, #04b58b 100%);
+$gradient-surface: linear-gradient(135deg, rgba(26, 32, 53, 0.7) 0%, rgba(17, 22, 38, 0.7) 100%);
+$gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+// Shadows
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+
+// Main container
+.segmentsContainer {
+  padding: 24px;
+  min-height: 100vh;
+  color: $color-text-primary;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+// Loading state
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  
+  p {
+    margin-top: 16px;
+    color: $color-text-secondary;
+    font-size: 16px;
+  }
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba($color-primary, 0.2);
+  border-top: 3px solid $color-primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+// Header
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 32px;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+}
+
+.headerLeft {
+  margin-bottom: 20px;
+  
+  @media (min-width: 768px) {
+    margin-bottom: 0;
+  }
+}
+
+.pageTitle {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin: 0 0 8px;
+  
+  svg {
+    margin-right: 12px;
+    color: $color-primary-light;
+  }
+}
+
+.pageSubtitle {
+  font-size: 16px;
+  color: $color-text-secondary;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.refreshButton, .exportButton {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: $color-surface-alt;
+  border: 1px solid $color-border;
+  border-radius: 8px;
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover:not(:disabled) {
+    background: rgba($color-surface-alt, 0.8);
+    border-color: rgba($color-primary, 0.3);
+    color: $color-text-primary;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  svg {
+    margin-right: 8px;
+  }
+}
+
+.createButton {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: $gradient-primary;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba($color-primary, 0.3);
+  font-family: inherit;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($color-primary, 0.4);
+  }
+  
+  svg {
+    margin-right: 8px;
+  }
+}
+
+// Stats Section
+.statsSection {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+  
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: $color-surface-card;
+  border-radius: 12px;
+  border: 1px solid $color-border;
+  backdrop-filter: blur(10px);
+  position: relative;
+  transition: all 0.3s ease;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: $gradient-glass;
+    z-index: -1;
+    opacity: 0.5;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($color-primary, 0.1);
+  color: $color-primary-light;
+  margin-right: 12px;
+}
+
+.statContent {
+  flex: 1;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: 2px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: $color-text-tertiary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// Controls Section
+.controlsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.searchAndFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  @media (min-width: 640px) {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+  
+  @media (min-width: 640px) {
+    width: 300px;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $color-text-tertiary;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 10px 10px 40px;
+  border-radius: 8px;
+  border: 1px solid $color-border;
+  background: rgba(255, 255, 255, 0.03);
+  color: $color-text-primary;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &::placeholder {
+    color: $color-text-tertiary;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: rgba($color-primary, 0.4);
+    box-shadow: 0 0 0 1px rgba($color-primary, 0.1);
+  }
+}
+
+.filterControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid $color-border;
+  background: rgba(255, 255, 255, 0.03);
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover, &.active {
+    background: rgba($color-primary, 0.1);
+    border-color: rgba($color-primary, 0.3);
+    color: $color-primary-light;
+  }
+  
+  svg {
+    margin-right: 6px;
+  }
+}
+
+.statusFilter, .sortSelect {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid $color-border;
+  background: rgba(255, 255, 255, 0.03);
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  
+  &:focus {
+    outline: none;
+    border-color: rgba($color-primary, 0.4);
+  }
+  
+  option {
+    background: $color-surface;
+    color: $color-text-primary;
+  }
+}
+
+.viewControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba($color-warning, 0.1);
+  border: 1px solid rgba($color-warning, 0.3);
+  border-radius: 8px;
+}
+
+.selectedCount {
+  font-size: 14px;
+  color: $color-warning;
+  font-weight: 500;
+}
+
+.bulkButton {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: rgba($color-error, 0.1);
+  border: 1px solid rgba($color-error, 0.3);
+  border-radius: 6px;
+  color: $color-error;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover {
+    background: rgba($color-error, 0.2);
+  }
+  
+  svg {
+    margin-right: 4px;
+  }
+}
+
+.viewToggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.viewButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: $color-text-tertiary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: $color-text-secondary;
+  }
+  
+  &.active {
+    background: rgba($color-primary, 0.1);
+    color: $color-primary-light;
+  }
+}
+
+// Filters Panel
+.filtersPanel {
+  background: $color-surface-alt;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid $color-border;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { 
+    opacity: 0;
+    transform: translateY(-10px); 
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0); 
+  }
+}
+
+.filterSection h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin: 0 0 16px;
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  
+  label {
+    font-size: 14px;
+    color: $color-text-secondary;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+}
+
+.rangeInputs, .dateInputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  span {
+    font-size: 12px;
+    color: $color-text-tertiary;
+  }
+}
+
+.rangeInput, .dateInput, .performanceFilter {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid $color-border;
+  background: rgba(255, 255, 255, 0.03);
+  color: $color-text-primary;
+  font-size: 14px;
+  font-family: inherit;
+  
+  &:focus {
+    outline: none;
+    border-color: rgba($color-primary, 0.4);
+  }
+  
+  &::placeholder {
+    color: $color-text-tertiary;
+  }
+}
+
+.filterActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.applyFilters {
+  padding: 8px 16px;
+  background: $color-primary;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  
+  &:hover {
+    background: $color-primary-dark;
+  }
+}
+
+.clearFilters {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $color-text-primary;
+  }
+}
+
+// Error Alert
+.errorAlert {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba($color-error, 0.1);
+  border: 1px solid rgba($color-error, 0.3);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  
+  svg {
+    color: $color-error;
+    margin-right: 12px;
+  }
+  
+  span {
+    flex: 1;
+    color: $color-error;
+    font-size: 14px;
+  }
+  
+  button {
+    background: none;
+    border: none;
+    color: $color-error;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+}
+
+// Segments Grid
+.segmentsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 20px;
+  margin-bottom: 32px;
+  
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (min-width: 1440px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// Segment Card
+.segmentCard {
+  background: $color-surface-card;
+  border-radius: 16px;
+  border: 1px solid $color-border;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: $gradient-glass;
+    z-index: -1;
+    opacity: 0.5;
+  }
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+    border-color: rgba($color-primary, 0.3);
+  }
+  
+  &.selected {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 1px rgba($color-primary, 0.4);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px 0;
+}
+
+.cardSelect {
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+}
+
+.cardMenu {
+  position: relative;
+}
+
+.menuButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: $color-text-tertiary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $color-text-primary;
+  }
+}
+
+.menuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: $shadow-md;
+  z-index: 10;
+  min-width: 140px;
+  animation: fadeInScale 0.2s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: $color-text-secondary;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $color-text-primary;
+  }
+  
+  &.danger {
+    color: $color-error;
+    
+    &:hover {
+      background: rgba($color-error, 0.1);
+    }
+  }
+  
+  svg {
+    margin-right: 8px;
+  }
+}
+
+.cardBody {
+  padding: 16px;
+  cursor: pointer;
+}
+
+.segmentIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.segmentName {
+  font-size: 18px;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+
+.segmentStats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: $color-text-secondary;
+  
+  svg {
+    margin-right: 8px;
+    color: $color-text-tertiary;
+  }
+}
+
+.segmentMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  
+  span {
+    color: $color-text-secondary;
+  }
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+  
+  &.active {
+    background-color: $color-success;
+  }
+  
+  &.inactive {
+    background-color: $color-text-tertiary;
+  }
+}
+
+.createdDate {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: $color-text-tertiary;
+  
+  svg {
+    margin-right: 4px;
+  }
+}
+
+.cardFooter {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid $color-border;
+}
+
+.viewButton, .editButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-family: inherit;
+  
+  svg {
+    margin-right: 6px;
+  }
+}
+
+.viewButton {
+  background: rgba($color-primary, 0.1);
+  color: $color-primary-light;
+  
+  &:hover {
+    background: rgba($color-primary, 0.2);
+  }
+}
+
+.editButton {
+  background: rgba(255, 255, 255, 0.05);
+  color: $color-text-secondary;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $color-text-primary;
+  }
+}
+
+// Segments List View
+.segmentsList {
+  background: $color-surface-card;
+  border-radius: 12px;
+  border: 1px solid $color-border;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  margin-bottom: 32px;
+}
+
+.listHeader {
+  display: grid;
+  grid-template-columns: 40px 2fr 1fr 1fr 1fr 120px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid $color-border;
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-text-tertiary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.listHeaderCell {
+  display: flex;
+  align-items: center;
+  
+  &.sortable {
+    cursor: pointer;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: $color-text-secondary;
+    }
+  }
+}
+
+.listItem {
+  display: grid;
+  grid-template-columns: 40px 2fr 1fr 1fr 1fr 120px;
+  padding: 16px;
+  border-bottom: 1px solid rgba($color-border, 0.5);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  &.selected {
+    background: rgba($color-primary, 0.05);
+    border-color: rgba($color-primary, 0.2);
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.listCell {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.segmentInfo {
+  display: flex;
+  align-items: center;
+  
+  .segmentIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    margin-right: 12px;
+    color: white;
+  }
+}
+
+.segmentDetails {
+  display: flex;
+  flex-direction: column;
+  
+  .segmentName {
+    font-weight: 500;
+    color: $color-text-primary;
+    margin-bottom: 2px;
+  }
+  
+  .segmentFilters {
+    font-size: 12px;
+    color: $color-text-tertiary;
+  }
+}
+
+.profileCount {
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: $color-text-tertiary;
+  
+  svg {
+    margin-right: 6px;
+  }
+}
+
+.listActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: $color-text-tertiary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $color-text-primary;
+  }
+}
+
+.actionMenu {
+  position: relative;
+}
+
+// Checkbox styles
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: $color-primary;
+  cursor: pointer;
+}
+
+// Empty State
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: $color-text-tertiary;
+  margin-bottom: 16px;
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin: 0 0 8px;
+}
+
+.emptyText {
+  font-size: 16px;
+  color: $color-text-secondary;
+  margin: 0 0 24px;
+  max-width: 400px;
+}
+
+.emptyAction {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  background: $gradient-primary;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($color-primary, 0.4);
+  }
+  
+  svg {
+    margin-right: 8px;
+  }
+}
+
+// Pagination
+.pagination {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  margin-top: 32px;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.paginationInfo {
+  font-size: 14px;
+  color: $color-text-secondary;
+}
+
+.paginationControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pageButton {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.05);
+    color: $color-text-primary;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &.active {
+    background: $color-primary;
+    border-color: $color-primary;
+    color: white;
+  }
+  
+  svg {
+    margin: 0 4px;
+  }
+}
+
+// Delete Modal (continued)
+.modalOverlay {
+ position: fixed;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background-color: rgba(0, 0, 0, 0.5);
+ backdrop-filter: blur(4px);
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ z-index: 1000;
+ animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+ from { opacity: 0; }
+ to { opacity: 1; }
+}
+
+.deleteModal {
+ background: $color-surface;
+ border-radius: 16px;
+ padding: 24px;
+ max-width: 400px;
+ width: 90%;
+ border: 1px solid $color-border;
+ box-shadow: $shadow-lg;
+ animation: slideInScale 0.3s ease-out;
+}
+
+@keyframes slideInScale {
+ from {
+   opacity: 0;
+   transform: scale(0.9) translateY(-20px);
+ }
+ to {
+   opacity: 1;
+   transform: scale(1) translateY(0);
+ }
+}
+
+.modalHeader {
+ display: flex;
+ align-items: center;
+ margin-bottom: 16px;
+ 
+ h3 {
+   font-size: 18px;
+   font-weight: 600;
+   color: $color-text-primary;
+   margin: 0 0 0 12px;
+ }
+}
+
+.warningIcon {
+ color: $color-warning;
+}
+
+.modalBody {
+ margin-bottom: 24px;
+ 
+ p {
+   color: $color-text-secondary;
+   margin: 0 0 8px;
+   line-height: 1.5;
+ }
+}
+
+.warningText {
+ font-size: 14px;
+ color: $color-warning;
+ font-weight: 500;
+}
+
+.modalActions {
+ display: flex;
+ gap: 12px;
+ justify-content: flex-end;
+}
+
+.cancelButton {
+ padding: 10px 20px;
+ background: transparent;
+ border: 1px solid $color-border;
+ border-radius: 8px;
+ color: $color-text-secondary;
+ font-size: 14px;
+ cursor: pointer;
+ transition: all 0.3s ease;
+ font-family: inherit;
+ 
+ &:hover {
+   background: rgba(255, 255, 255, 0.05);
+   color: $color-text-primary;
+ }
+}
+
+.deleteButton {
+ padding: 10px 20px;
+ background: $color-error;
+ border: none;
+ border-radius: 8px;
+ color: white;
+ font-size: 14px;
+ font-weight: 500;
+ cursor: pointer;
+ transition: all 0.3s ease;
+ font-family: inherit;
+ 
+ &:hover {
+   background: darken($color-error, 10%);
+   transform: translateY(-1px);
+ }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+ .segmentsContainer {
+   padding: 16px;
+ }
+ 
+ .pageTitle {
+   font-size: 24px;
+ }
+ 
+ .pageSubtitle {
+   font-size: 14px;
+ }
+ 
+ .headerActions {
+   width: 100%;
+   justify-content: stretch;
+   
+   .refreshButton,
+   .exportButton,
+   .createButton {
+     flex: 1;
+     justify-content: center;
+   }
+ }
+ 
+ .controlsSection {
+   gap: 12px;
+ }
+ 
+ .searchAndFilters {
+   gap: 8px;
+ }
+ 
+ .filterControls {
+   gap: 6px;
+ }
+ 
+ .segmentsGrid {
+   grid-template-columns: 1fr;
+   gap: 16px;
+ }
+ 
+ .listHeader,
+ .listItem {
+   grid-template-columns: 30px 1fr 80px 60px;
+   gap: 8px;
+   padding: 12px;
+   font-size: 12px;
+ }
+ 
+ .listHeader {
+   .listHeaderCell:nth-child(3),
+   .listHeaderCell:nth-child(4) {
+     display: none;
+   }
+ }
+ 
+ .listItem {
+   .listCell:nth-child(3),
+   .listCell:nth-child(4) {
+     display: none;
+   }
+ }
+ 
+ .segmentInfo {
+   .segmentIcon {
+     width: 28px;
+     height: 28px;
+     margin-right: 8px;
+   }
+ }
+ 
+ .segmentDetails {
+   .segmentName {
+     font-size: 13px;
+   }
+   
+   .segmentFilters {
+     font-size: 11px;
+   }
+ }
+ 
+ .listActions {
+   gap: 4px;
+ }
+ 
+ .actionButton {
+   width: 24px;
+   height: 24px;
+ }
+ 
+ .cardFooter {
+   flex-direction: column;
+   gap: 8px;
+ }
+ 
+ .viewButton,
+ .editButton {
+   justify-content: center;
+ }
+ 
+ .pagination {
+   gap: 12px;
+ }
+ 
+ .paginationControls {
+   gap: 4px;
+ }
+ 
+ .pageButton {
+   padding: 6px 8px;
+   font-size: 12px;
+ }
+ 
+ .filtersPanel {
+   padding: 16px;
+ }
+ 
+ .filterGrid {
+   grid-template-columns: 1fr;
+   gap: 12px;
+ }
+ 
+ .filterActions {
+   flex-direction: column;
+   gap: 8px;
+ }
+ 
+ .applyFilters,
+ .clearFilters {
+   width: 100%;
+   justify-content: center;
+ }
+}
+
+@media (max-width: 480px) {
+ .segmentsContainer {
+   padding: 12px;
+ }
+ 
+ .statsSection {
+   grid-template-columns: repeat(2, 1fr);
+   gap: 12px;
+ }
+ 
+ .statCard {
+   padding: 12px;
+ }
+ 
+ .statIcon {
+   width: 32px;
+   height: 32px;
+   margin-right: 8px;
+ }
+ 
+ .statValue {
+   font-size: 16px;
+ }
+ 
+ .statLabel {
+   font-size: 11px;
+ }
+ 
+ .searchContainer {
+   width: 100%;
+ }
+ 
+ .searchInput {
+   padding: 8px 8px 8px 36px;
+ }
+ 
+ .filterControls {
+   flex-direction: column;
+   align-items: stretch;
+   gap: 8px;
+ }
+ 
+ .filterButton,
+ .statusFilter,
+ .sortSelect {
+   width: 100%;
+   justify-content: center;
+ }
+ 
+ .viewControls {
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+ .bulkActions {
+   flex: 1;
+   justify-content: center;
+ }
+ 
+ .segmentCard {
+   .cardBody {
+     padding: 12px;
+   }
+   
+   .segmentIcon {
+     width: 40px;
+     height: 40px;
+   }
+   
+   .segmentName {
+     font-size: 16px;
+   }
+   
+   .statItem {
+     font-size: 12px;
+   }
+ }
+ 
+ .emptyState {
+   padding: 48px 16px;
+ }
+ 
+ .emptyIcon {
+   width: 48px;
+   height: 48px;
+ }
+ 
+ .emptyTitle {
+   font-size: 18px;
+ }
+ 
+ .emptyText {
+   font-size: 14px;
+ }
+ 
+ .deleteModal {
+   padding: 20px;
+   margin: 16px;
+   
+   .modalHeader h3 {
+     font-size: 16px;
+   }
+   
+   .modalBody p {
+     font-size: 14px;
+   }
+   
+   .modalActions {
+     flex-direction: column;
+     gap: 8px;
+   }
+   
+   .cancelButton,
+   .deleteButton {
+     width: 100%;
+     justify-content: center;
+   }
+ }
+}
+
+// Animation utilities
+@keyframes fadeInUp {
+ from {
+   opacity: 0;
+   transform: translateY(20px);
+ }
+ to {
+   opacity: 1;
+   transform: translateY(0);
+ }
+}
+
+@keyframes slideInLeft {
+ from {
+   opacity: 0;
+   transform: translateX(-20px);
+ }
+ to {
+   opacity: 1;
+   transform: translateX(0);
+ }
+}
+
+// Apply animations to cards
+.segmentCard {
+ animation: fadeInUp 0.5s ease-out;
+ 
+ &:nth-child(1) { animation-delay: 0.1s; }
+ &:nth-child(2) { animation-delay: 0.15s; }
+ &:nth-child(3) { animation-delay: 0.2s; }
+ &:nth-child(4) { animation-delay: 0.25s; }
+ &:nth-child(5) { animation-delay: 0.3s; }
+ &:nth-child(6) { animation-delay: 0.35s; }
+ &:nth-child(7) { animation-delay: 0.4s; }
+ &:nth-child(8) { animation-delay: 0.45s; }
+}
+
+.listItem {
+ animation: slideInLeft 0.4s ease-out;
+ 
+ &:nth-child(1) { animation-delay: 0.05s; }
+ &:nth-child(2) { animation-delay: 0.1s; }
+ &:nth-child(3) { animation-delay: 0.15s; }
+ &:nth-child(4) { animation-delay: 0.2s; }
+ &:nth-child(5) { animation-delay: 0.25s; }
+ &:nth-child(6) { animation-delay: 0.3s; }
+ &:nth-child(7) { animation-delay: 0.35s; }
+ &:nth-child(8) { animation-delay: 0.4s; }
+}
+
+.statCard {
+ animation: fadeInUp 0.4s ease-out;
+ 
+ &:nth-child(1) { animation-delay: 0.1s; }
+ &:nth-child(2) { animation-delay: 0.2s; }
+ &:nth-child(3) { animation-delay: 0.3s; }
+ &:nth-child(4) { animation-delay: 0.4s; }
+}
+
+// Custom scrollbar for any overflow areas
+.segmentsList,
+.menuDropdown {
+ &::-webkit-scrollbar {
+   width: 6px;
+ }
+ 
+ &::-webkit-scrollbar-track {
+   background: transparent;
+ }
+ 
+ &::-webkit-scrollbar-thumb {
+   background: rgba(255, 255, 255, 0.1);
+   border-radius: 3px;
+ }
+ 
+ &::-webkit-scrollbar-thumb:hover {
+   background: rgba(255, 255, 255, 0.15);
+ }
+}
+
+// Focus states for accessibility
+.searchInput:focus,
+.statusFilter:focus,
+.sortSelect:focus,
+.rangeInput:focus,
+.dateInput:focus,
+.performanceFilter:focus {
+ outline: 2px solid rgba($color-primary, 0.5);
+ outline-offset: 2px;
+}
+
+.createButton:focus,
+.refreshButton:focus,
+.exportButton:focus,
+.filterButton:focus,
+.viewButton:focus,
+.pageButton:focus {
+ outline: 2px solid rgba($color-primary, 0.5);
+ outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+ .segmentCard,
+ .statCard,
+ .deleteModal {
+   border-width: 2px;
+ }
+ 
+ .statusDot {
+   border: 1px solid currentColor;
+ }
+ 
+ .menuDropdown {
+   border-width: 2px;
+ }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+ .segmentCard,
+ .listItem,
+ .statCard,
+ .deleteModal,
+ .modalOverlay,
+ .filtersPanel {
+   animation: none;
+ }
+ 
+ .segmentCard:hover,
+ .statCard:hover,
+ .createButton:hover,
+ .viewButton:hover,
+ .editButton:hover {
+   transform: none;
+ }
+}

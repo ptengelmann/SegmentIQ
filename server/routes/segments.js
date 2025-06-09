@@ -5,12 +5,14 @@ import {
   getSegments, 
   getSegmentById, 
   updateSegment,
-  deleteSegment 
+  deleteSegment,
+  previewSegment  // ADD THIS IMPORT
 } from '../controllers/segments.js';
 
 const router = express.Router();
 
 router.post('/', createSegment);
+router.post('/preview', previewSegment);  // ADD THIS LINE
 router.get('/', getSegments);
 router.get('/:id', getSegmentById);
 router.put('/:id', updateSegment);
