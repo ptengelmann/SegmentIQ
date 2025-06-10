@@ -1,0 +1,1529 @@
+// pages/segments/SegmentHistory.module.scss
+@import '../../styles/variables';
+
+// Color variables to match the app theme
+$color-background: #0a0e17;
+$color-surface: #131827;
+$color-surface-alt: #1a2035;
+$color-surface-card: rgba(26, 32, 53, 0.7);
+$color-primary: #7b61ff;
+$color-primary-light: #9a85ff;
+$color-primary-dark: #5a3ff0;
+$color-accent: #06d6a0;
+$color-accent-light: #0ceeb1;
+$color-text-primary: rgba(255, 255, 255, 0.95);
+$color-text-secondary: rgba(255, 255, 255, 0.65);
+$color-text-tertiary: rgba(255, 255, 255, 0.45);
+$color-border: rgba(255, 255, 255, 0.08);
+$color-success: #1ce8b5;
+$color-warning: #ffaa5a;
+$color-error: #ff5a5a;
+$color-info: #4cc9f0;
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+$gradient-accent: linear-gradient(135deg, $color-accent 0%, #04b58b 100%);
+$gradient-surface: linear-gradient(135deg, rgba(26, 32, 53, 0.7) 0%, rgba(17, 22, 38, 0.7) 100%);
+$gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+// Shadows
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+
+// Main container
+.historyContainer {
+  padding: 24px;
+  min-height: 100vh;
+  color: $color-text-primary;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+// Loading state
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  
+  p {
+    margin-top: 16px;
+    color: $color-text-secondary;
+    font-size: 16px;
+  }
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba($color-primary, 0.2);
+  border-top: 3px solid $color-primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+// Error state
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  padding: 32px;
+  
+  svg {
+    color: $color-error;
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin: 0 0 8px;
+  }
+  
+  p {
+    color: $color-text-secondary;
+    margin: 0 0 24px;
+  }
+}
+
+.retryButton {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  background: $color-primary;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover {
+    background: $color-primary-dark;
+    transform: translateY(-1px);
+  }
+  
+  svg {
+    margin-right: 8px;
+  }
+}
+
+// Header
+.historyHeader {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 32px;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+}
+
+.headerLeft {
+  margin-bottom: 20px;
+  
+  @media (min-width: 768px) {
+    margin-bottom: 0;
+  }
+}
+
+.pageTitle {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin: 0 0 8px;
+  
+  svg {
+    margin-right: 12px;
+    color: $color-primary-light;
+  }
+}
+
+.pageSubtitle {
+  font-size: 16px;
+  color: $color-text-secondary;
+  margin: 0;
+  max-width: 600px;
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.refreshButton, .exportButton {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: $color-surface-alt;
+  border: 1px solid $color-border;
+  border-radius: 8px;
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover:not(:disabled) {
+    background: rgba($color-surface-alt, 0.8);
+    border-color: rgba($color-primary, 0.3);
+    color: $color-text-primary;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  svg {
+    margin-right: 8px;
+  }
+}
+
+.viewSegmentButton {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: $gradient-primary;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($color-primary, 0.4);
+  }
+  
+  svg {
+    margin-right: 8px;
+  }
+}
+
+// Stats Section
+.statsSection {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+  
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: $color-surface-card;
+  border-radius: 12px;
+  border: 1px solid $color-border;
+  backdrop-filter: blur(10px);
+  position: relative;
+  transition: all 0.3s ease;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: $gradient-glass;
+    z-index: -1;
+    opacity: 0.5;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($color-primary, 0.1);
+  color: $color-primary-light;
+  margin-right: 12px;
+}
+
+.statContent {
+  flex: 1;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: 2px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: $color-text-tertiary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// Controls Section
+.controlsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.searchAndFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  @media (min-width: 640px) {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+  
+  @media (min-width: 640px) {
+    width: 300px;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $color-text-tertiary;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 10px 10px 40px;
+  border-radius: 8px;
+  border: 1px solid $color-border;
+  background: rgba(255, 255, 255, 0.03);
+  color: $color-text-primary;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &::placeholder {
+    color: $color-text-tertiary;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: rgba($color-primary, 0.4);
+    box-shadow: 0 0 0 1px rgba($color-primary, 0.1);
+  }
+}
+
+.filterControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.typeFilter, .dateFilter {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid $color-border;
+  background: rgba(255, 255, 255, 0.03);
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  
+  &:focus {
+    outline: none;
+    border-color: rgba($color-primary, 0.4);
+  }
+  
+  option {
+    background: $color-surface;
+    color: $color-text-primary;
+  }
+}
+
+.viewControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.compareButton {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid $color-border;
+  background: rgba(255, 255, 255, 0.03);
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover, &.active {
+    background: rgba($color-primary, 0.1);
+    border-color: rgba($color-primary, 0.3);
+    color: $color-primary-light;
+  }
+  
+  svg {
+    margin-right: 8px;
+  }
+}
+
+// Comparison Banner
+.comparisonBanner {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba($color-info, 0.1);
+  border: 1px solid rgba($color-info, 0.3);
+  border-radius: 8px;
+  margin-bottom: 24px;
+  animation: slideDown 0.3s ease-out;
+  
+  svg {
+    color: $color-info;
+    margin-right: 12px;
+  }
+  
+  span {
+    flex: 1;
+    color: $color-info;
+    font-size: 14px;
+  }
+}
+
+@keyframes slideDown {
+  from { 
+    opacity: 0;
+    transform: translateY(-10px); 
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0); 
+  }
+}
+
+.viewComparisonButton {
+  padding: 6px 12px;
+  background: $color-info;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  
+  &:hover {
+    background: darken($color-info, 10%);
+  }
+}
+
+// History Timeline
+.historyTimeline {
+  position: relative;
+}
+
+.historyItem {
+  display: flex;
+  margin-bottom: 24px;
+  position: relative;
+  
+  &.selected {
+    .itemContent {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 1px rgba($color-primary, 0.4);
+    }
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.timelineConnector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 16px;
+  min-width: 32px;
+}
+
+.timelineLine {
+  width: 2px;
+  height: 24px;
+  background: rgba($color-border, 0.5);
+  
+  &:first-child {
+    margin-bottom: 8px;
+  }
+  
+  &:last-child {
+    margin-top: 8px;
+  }
+}
+
+.timelineNode {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.2;
+    filter: blur(4px);
+    z-index: -1;
+  }
+}
+
+.itemContent {
+  flex: 1;
+  background: $color-surface-card;
+  border-radius: 12px;
+  border: 1px solid $color-border;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  position: relative;
+  transition: all 0.3s ease;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: $gradient-glass;
+    z-index: -1;
+    opacity: 0.5;
+  }
+  
+  &:hover {
+    border-color: rgba($color-primary, 0.2);
+    transform: translateX(4px);
+  }
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.itemTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.version {
+  padding: 4px 8px;
+  background: rgba($color-primary, 0.1);
+  color: $color-primary-light;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.action {
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-text-primary;
+  text-transform: capitalize;
+}
+
+.itemMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 13px;
+  color: $color-text-tertiary;
+}
+
+.user, .timestamp, .size {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  svg {
+    opacity: 0.7;
+  }
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selectButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid $color-border;
+  background: rgba(255, 255, 255, 0.03);
+  color: $color-text-tertiary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $color-text-primary;
+  }
+  
+  &.selected {
+    background: rgba($color-primary, 0.1);
+    border-color: rgba($color-primary, 0.3);
+    color: $color-primary-light;
+  }
+}
+
+.expandButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: $color-text-tertiary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $color-text-primary;
+  }
+}
+
+.itemDescription {
+  font-size: 14px;
+  color: $color-text-secondary;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.expandedContent {
+  border-top: 1px solid $color-border;
+  padding-top: 16px;
+  animation: expandIn 0.3s ease-out;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    height: 0;
+    padding-top: 0;
+  }
+  to {
+    opacity: 1;
+    height: auto;
+    padding-top: 16px;
+  }
+}
+
+.changesDetails {
+  margin-bottom: 16px;
+}
+
+.changeItem {
+  margin-bottom: 12px;
+  font-size: 14px;
+  
+  strong {
+    color: $color-text-primary;
+    margin-right: 8px;
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.oldValue {
+  color: $color-error;
+  background: rgba($color-error, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.newValue {
+  color: $color-success;
+  background: rgba($color-success, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.addedValue {
+  color: $color-success;
+  background: rgba($color-success, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.removedValue {
+  color: $color-error;
+  background: rgba($color-error, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.changeArrow {
+  margin: 0 8px;
+  color: $color-text-tertiary;
+  vertical-align: middle;
+}
+
+.filtersList {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filterItem {
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  color: $color-text-secondary;
+}
+
+.modificationDetails {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.itemActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  color: $color-text-secondary;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: $color-text-primary;
+  }
+  
+  &:first-child:hover {
+    background: rgba($color-warning, 0.1);
+    border-color: rgba($color-warning, 0.3);
+    color: $color-warning;
+  }
+  
+  svg {
+    margin-right: 6px;
+  }
+}
+
+// Empty State
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: $color-text-tertiary;
+  margin-bottom: 16px;
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin: 0 0 8px;
+}
+
+.emptyText {
+  font-size: 16px;
+  color: $color-text-secondary;
+  margin: 0;
+  max-width: 400px;
+}
+
+// Load More Section
+.loadMoreSection {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.loadMoreButton {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  background: $color-surface-alt;
+  border: 1px solid $color-border;
+  border-radius: 8px;
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &:hover {
+    background: rgba($color-surface-alt, 0.8);
+    border-color: rgba($color-primary, 0.3);
+    color: $color-text-primary;
+  }
+  
+  svg {
+    margin-right: 8px;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .historyContainer {
+    padding: 16px;
+  }
+  
+  .pageTitle {
+    font-size: 24px;
+  }
+  
+  .pageSubtitle {
+    font-size: 14px;
+  }
+  
+  .headerActions {
+    width: 100%;
+    
+    .refreshButton,
+    .exportButton,
+    .viewSegmentButton {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+  
+  .controlsSection {
+    gap: 12px;
+  }
+  
+  .searchAndFilters {
+    gap: 8px;
+  }
+  
+  .filterControls {
+    gap: 6px;
+    
+    .typeFilter,
+    .dateFilter {
+      flex: 1;
+      min-width: 120px;
+    }
+  }
+  
+  .historyItem {
+    margin-bottom: 20px;
+  }
+  
+  .timelineConnector {
+    margin-right: 12px;
+    min-width: 28px;
+  }
+  
+  .timelineNode {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .itemContent {
+    padding: 16px;
+  }
+  
+  .itemMeta {
+    gap: 12px;
+    font-size: 12px;
+  }
+  
+  .user, .timestamp, .size {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    
+    svg {
+      display: none;
+    }
+  }
+  
+  .headerRight {
+    gap: 4px;
+  }
+  
+  .selectButton,
+  .expandButton {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .changeItem {
+    font-size: 13px;
+  }
+  
+  .modificationDetails {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .itemActions {
+    gap: 6px;
+  }
+  
+  .actionButton {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .historyContainer {
+    padding: 12px;
+  }
+  
+  .statsSection {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .statCard {
+    padding: 12px;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .statIcon {
+    margin-right: 0;
+    margin-bottom: 8px;
+    width: 32px;
+    height: 32px;
+  }
+  
+  .statValue {
+    font-size: 18px;
+  }
+  
+  .statLabel {
+    font-size: 11px;
+  }
+  
+  .searchContainer {
+    width: 100%;
+  }
+  
+  .filterControls {
+    flex-direction: column;
+    gap: 8px;
+    
+    .typeFilter,
+    .dateFilter {
+      width: 100%;
+    }
+  }
+  
+  .compareButton {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .comparisonBanner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    
+    .viewComparisonButton {
+      align-self: stretch;
+      text-align: center;
+    }
+  }
+  
+  .timelineConnector {
+    margin-right: 8px;
+    min-width: 24px;
+  }
+  
+  .timelineNode {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .timelineLine {
+    height: 20px;
+  }
+  
+  .itemContent {
+    padding: 12px;
+  }
+  
+  .itemTitle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .itemMeta {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .itemActions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .actionButton {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .emptyState {
+    padding: 48px 16px;
+  }
+  
+  .emptyIcon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .emptyTitle {
+    font-size: 18px;
+  }
+  
+  .emptyText {
+    font-size: 14px;
+  }
+}
+
+// Animation utilities
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba($color-primary, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba($color-primary, 0.6);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -6px, 0);
+  }
+  70% {
+    transform: translate3d(0, -3px, 0);
+  }
+  90% {
+    transform: translate3d(0, -1px, 0);
+  }
+}
+
+// Apply animations to timeline items
+.historyItem {
+  animation: slideInLeft 0.5s ease-out;
+  animation-fill-mode: both;
+  
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.15s; }
+  &:nth-child(3) { animation-delay: 0.2s; }
+  &:nth-child(4) { animation-delay: 0.25s; }
+  &:nth-child(5) { animation-delay: 0.3s; }
+  &:nth-child(6) { animation-delay: 0.35s; }
+  &:nth-child(7) { animation-delay: 0.4s; }
+  &:nth-child(8) { animation-delay: 0.45s; }
+  &:nth-child(n+9) { animation-delay: 0.5s; }
+}
+
+.statCard {
+  animation: fadeInUp 0.4s ease-out;
+  animation-fill-mode: both;
+  
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+  &:nth-child(4) { animation-delay: 0.4s; }
+}
+
+// Interactive states and micro-animations
+.historyItem:hover .timelineNode {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.refreshButton.spinning {
+  svg {
+    animation: spin 1s linear infinite;
+  }
+}
+
+.viewSegmentButton:hover {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.statCard:hover .statIcon {
+  animation: bounce 1s ease-in-out;
+}
+
+// Loading skeleton animations
+.loadingContainer .loadingSpinner {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, transparent, rgba($color-primary, 0.1), transparent);
+    animation: spin 2s linear infinite reverse;
+  }
+}
+
+// Focus states for accessibility
+.searchInput:focus,
+.typeFilter:focus,
+.dateFilter:focus {
+  outline: 2px solid rgba($color-primary, 0.5);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba($color-primary, 0.1);
+}
+
+.compareButton:focus,
+.viewSegmentButton:focus,
+.refreshButton:focus,
+.exportButton:focus,
+.retryButton:focus,
+.actionButton:focus,
+.selectButton:focus,
+.expandButton:focus,
+.loadMoreButton:focus,
+.viewComparisonButton:focus {
+  outline: 2px solid rgba($color-primary, 0.5);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba($color-primary, 0.1);
+}
+
+// Dark mode enhancements
+@media (prefers-color-scheme: dark) {
+  .historyContainer {
+    background: $color-background;
+  }
+  
+  .itemContent {
+    background: rgba($color-surface-card, 0.8);
+    
+    &:hover {
+      background: rgba($color-surface-card, 0.9);
+    }
+  }
+  
+  .statCard {
+    background: rgba($color-surface-card, 0.6);
+    
+    &:hover {
+      background: rgba($color-surface-card, 0.8);
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .itemContent,
+  .statCard {
+    border-width: 2px;
+  }
+  
+  .searchInput,
+  .typeFilter,
+  .dateFilter,
+  .compareButton {
+    border-width: 2px;
+  }
+  
+  .version,
+  .oldValue,
+  .newValue,
+  .addedValue,
+  .removedValue {
+    font-weight: 700;
+  }
+}
+
+// Reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .historyItem {
+    animation: none;
+  }
+  
+  .statCard {
+    animation: none;
+  }
+  
+  .loadingSpinner {
+    animation: none;
+    border: 3px solid $color-primary;
+    border-top: 3px solid transparent;
+  }
+}
+
+// Print styles
+@media print {
+  .historyContainer {
+    color: black !important;
+    background: white !important;
+    font-size: 12px;
+  }
+  
+  .headerActions,
+  .controlsSection,
+  .comparisonBanner,
+  .loadMoreSection {
+    display: none !important;
+  }
+  
+  .itemContent {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    break-inside: avoid;
+    margin-bottom: 16px;
+  }
+  
+  .timelineNode {
+    background: #333 !important;
+    color: white !important;
+  }
+  
+  .version {
+    background: #f0f0f0 !important;
+    color: #333 !important;
+  }
+  
+  .oldValue,
+  .newValue,
+  .addedValue,
+  .removedValue {
+    background: #f9f9f9 !important;
+    color: #333 !important;
+    border: 1px solid #ddd !important;
+  }
+}
+
+// Utility classes for dynamic styling
+.highlighted {
+  background: rgba($color-warning, 0.1) !important;
+  border-color: rgba($color-warning, 0.3) !important;
+  
+  .version {
+    background: rgba($color-warning, 0.2);
+    color: $color-warning;
+  }
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+}
+
+.loading {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.05),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+}
+
+.error {
+  border-color: rgba($color-error, 0.5) !important;
+  background: rgba($color-error, 0.05) !important;
+  
+  .version {
+    background: rgba($color-error, 0.1);
+    color: $color-error;
+  }
+}
+
+.success {
+  border-color: rgba($color-success, 0.5) !important;
+  background: rgba($color-success, 0.05) !important;
+  
+  .version {
+    background: rgba($color-success, 0.1);
+    color: $color-success;
+  }
+}
+
+// Custom scrollbar styles
+.historyContainer {
+  scrollbar-width: thin;
+  scrollbar-color: rgba($color-primary, 0.3) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba($color-primary, 0.3);
+    border-radius: 4px;
+    
+    &:hover {
+      background: rgba($color-primary, 0.5);
+    }
+  }
+}
+
+// Selection styles
+::selection {
+  background: rgba($color-primary, 0.3);
+  color: $color-text-primary;
+}
+
+::-moz-selection {
+  background: rgba($color-primary, 0.3);
+  color: $color-text-primary;
+}
+
+// Tooltip styles (if needed for additional features)
+.tooltip {
+  position: absolute;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: rgba($color-surface, 0.95);
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  font-size: 12px;
+  color: $color-text-primary;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: all 0.2s ease;
+  
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: rgba($color-surface, 0.95);
+  }
+}
+
+// Custom checkbox styles for comparison mode
+.customCheckbox {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  
+  input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+    
+    &:checked + .checkmark {
+      background: $color-primary;
+      border-color: $color-primary;
+      
+      &::after {
+        opacity: 1;
+        transform: rotate(45deg) scale(1);
+      }
+    }
+    
+    &:focus + .checkmark {
+      box-shadow: 0 0 0 2px rgba($color-primary, 0.3);
+    }
+  }
+  
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    background: transparent;
+    border: 2px solid $color-border;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      opacity: 0;
+      transform: rotate(45deg) scale(0.8);
+      transition: all 0.2s ease;
+    }
+  }
+}
