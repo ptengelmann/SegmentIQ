@@ -27,6 +27,7 @@ import UploadPage from './pages/upload/upload';
 import SegmentBuilder from './pages/segments/segmentBuilder';
 import SegmentsList from './pages/segments/SegmentsList';
 import SegmentHistory from './pages/segments/SegmentHistory';
+import SegmentTemplates from './pages/segments/SegmentTemplates';
 import ProfilesPage from './pages/profiles/profilesPage';
 
 // Custom NavLink wrapper with animation capabilities
@@ -364,7 +365,7 @@ function App() {
              <Route path="/segments/create" element={<SegmentBuilder />} />
              <Route path="/segments/list" element={<SegmentsList />} />
              <Route path="/segments/history" element={<SegmentHistory />} />
-             
+             <Route path="/segments/templates" element={<SegmentTemplates />} />             
              {/* Other pages */}             
 
              

@@ -8,8 +8,7 @@ import {
   Users, Layers, Activity, 
   TrendingUp, ArrowRight, Zap, Shield, ArrowUpRight, 
   BarChart2, Download, RefreshCw,
-  Clock, Target,
-  AlertTriangle, Eye, Database, BarChart3
+  Clock, Target, AlertTriangle, Eye, Database, BarChart3
 } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -26,7 +25,7 @@ export default function DashboardPage() {
   
   // Colors for charts
   const COLORS = useMemo(() => [
-    '#7b61ff', '#06d6a0', '#4cc9f0', '#f72585', '#8b5cf6', '#3b82f6'
+    '#8b5cf6', '#06d6a0', '#4cc9f0', '#f72585', '#7b61ff', '#3b82f6'
   ], []);
   
   // Fetch data on time range change
@@ -105,9 +104,170 @@ export default function DashboardPage() {
 
   const trendData = useMemo(() => generateTrendData(), [generateTrendData]);
 
+  // Custom tooltip component for charts
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className={styles.customTooltip}>
+          <p className={styles.tooltipLabel}>{label}</p>
+          {payload.map((entry, index) => (
+            <div key={`item-${index}`} className={styles.tooltipItem}>
+              <div 
+                className={styles.tooltipMarker} 
+                style={{ backgroundColor: entry.color }}
+              ></div>
+              <span className={styles.tooltipName}>{entry.name}:</span>
+              <span className={styles.tooltipValue}>
+                {entry.value.toLocaleString()}
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // KPI Card component (inline since we're not creating separate files)
+  const KpiCard = ({ 
+    icon: Icon, 
+    title, 
+    value, 
+    subtitle, 
+    trend, 
+    chartData, 
+    chartType = 'area', 
+    color = '#8b5cf6',
+    secondaryColor = 'rgba(139, 92, 246, 0.3)',
+    className = '' 
+  }) => {
+    // Calculate style properties
+    const iconBgColor = `rgba(${parseInt(color.slice(1, 3), 16)}, ${parseInt(color.slice(3, 5), 16)}, ${parseInt(color.slice(5, 7), 16)}, 0.15)`;
+    
+    // Chart config
+    const renderChart = () => {
+      if (chartType === 'area') {
+        return (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData.slice(-6)} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+              <defs>
+                <linearGradient id={`gradient-${title.replace(/\s/g, '')}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={color} stopOpacity={0.3} />
+                  <stop offset="100%" stopColor={color} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <Area 
+                type="monotone" 
+                dataKey="profiles" 
+                stroke={color} 
+                strokeWidth={2}
+                fill={`url(#gradient-${title.replace(/\s/g, '')})`}
+                dot={false}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        );
+      } else if (chartType === 'line') {
+        return (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData.slice(-6)} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+              <Line 
+                type="monotone" 
+                dataKey="segments" 
+                stroke={color} 
+                strokeWidth={2} 
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        );
+      } else if (chartType === 'gauge') {
+        return (
+          <div className={styles.cardGauge}>
+            <div className={styles.gaugeContainer}>
+              <svg viewBox="0 0 100 50" className={styles.gauge}>
+                <path 
+                  d="M10,40 A30,30 0 1,1 90,40"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth="6"
+                />
+                <path 
+                  d="M10,40 A30,30 0 1,1 90,40"
+                  fill="none"
+                  stroke={color}
+                  strokeWidth="6"
+                  strokeDasharray={`${value * 1.26}, 126`}
+                />
+              </svg>
+            </div>
+          </div>
+        );
+      } else if (chartType === 'progress') {
+        return (
+          <div className={styles.cardProgress}>
+            <div className={styles.progressBar}>
+              <div 
+                className={styles.progressFill}
+                style={{ 
+                  width: `${Math.min(100, value / 10)}%`,
+                  background: `linear-gradient(90deg, ${color}, ${secondaryColor})`
+                }}
+              ></div>
+            </div>
+          </div>
+        );
+      }
+    };
+    
+    return (
+      <div className={`${styles.kpiCard} ${className}`} style={{ "--card-color": color }}>
+        <div className={styles.cardHeader}>
+          <div className={styles.cardIcon} style={{ background: iconBgColor }}>
+            <Icon size={22} color={color} />
+            <div className={styles.iconGlow} style={{ background: iconBgColor }}></div>
+          </div>
+          {trend && (
+            <div className={styles.cardTrend}>
+              <ArrowUpRight size={14} />
+              <span>{trend}</span>
+            </div>
+          )}
+        </div>
+        <div className={styles.cardContent}>
+          <h3 className={styles.cardTitle}>{title}</h3>
+          <div className={styles.cardValue}>
+            {value.toLocaleString()}
+          </div>
+          <p className={styles.cardSubtitle}>{subtitle}</p>
+        </div>
+        <div className={styles.cardSparkline}>
+          {renderChart()}
+        </div>
+      </div>
+    );
+  };
+
+  // Quick Action component
+  const QuickAction = ({ icon: Icon, title, description, onClick }) => {
+    return (
+      <button className={styles.quickActionCard} onClick={onClick}>
+        <div className={styles.actionIcon}>
+          <Icon size={20} />
+        </div>
+        <div className={styles.actionContent}>
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
+        <ArrowRight size={16} className={styles.actionArrow} />
+      </button>
+    );
+  };
+
   // Loading state
   if (loading) return (
     <div className={styles.loadingContainer}>
+      <div className={styles.auroraBackground}></div>
       <div className={styles.loadingAnimation}>
         <div className={styles.loadingSpinner}>
           <div className={styles.spinnerRing}></div>
@@ -126,6 +286,7 @@ export default function DashboardPage() {
   // Error state
   if (error) return (
     <div className={styles.errorContainer}>
+      <div className={styles.auroraBackground}></div>
       <div className={styles.errorContent}>
         <div className={styles.errorIcon}>
           <AlertTriangle size={32} />
@@ -146,6 +307,13 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.dashboardContainer}>
+      {/* Aurora Background */}
+      <div className={styles.auroraBackground}>
+        <div className={styles.aurora1}></div>
+        <div className={styles.aurora2}></div>
+        <div className={styles.aurora3}></div>
+      </div>
+      
       {/* Enhanced Dashboard Header */}
       <div className={styles.dashboardHeader}>
         <div className={styles.headerLeft}>
@@ -194,137 +362,49 @@ export default function DashboardPage() {
       
       {/* Enhanced KPI Cards */}
       <div className={styles.kpiGrid}>
-        <div className={`${styles.kpiCard} ${styles.primaryCard}`}>
-          <div className={styles.cardHeader}>
-            <div className={styles.cardIcon}>
-              <Users size={24} />
-              <div className={styles.iconGlow}></div>
-            </div>
-            <div className={styles.cardTrend}>
-              <ArrowUpRight size={14} />
-              <span>+12.5%</span>
-            </div>
-          </div>
-          <div className={styles.cardContent}>
-            <h3 className={styles.cardTitle}>Total Profiles</h3>
-            <div className={styles.cardValue}>
-              {metrics.totalProfiles.toLocaleString()}
-            </div>
-            <p className={styles.cardSubtitle}>Active customer profiles</p>
-          </div>
-          <div className={styles.cardSparkline}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trendData.slice(-6)}>
-                <defs>
-                  <linearGradient id="profilesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#7b61ff" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#7b61ff" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <Area 
-                  type="monotone" 
-                  dataKey="profiles" 
-                  stroke="#7b61ff" 
-                  strokeWidth={2}
-                  fill="url(#profilesGradient)"
-                  dot={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        <KpiCard 
+          icon={Users}
+          title="Total Profiles"
+          value={metrics.totalProfiles}
+          subtitle="Active customer profiles"
+          trend="+12.5%"
+          chartData={trendData}
+          chartType="area"
+          color="#8b5cf6"
+          className={styles.primaryCard}
+        />
 
-        <div className={`${styles.kpiCard} ${styles.accentCard}`}>
-          <div className={styles.cardHeader}>
-            <div className={styles.cardIcon}>
-              <Layers size={24} />
-              <div className={styles.iconGlow}></div>
-            </div>
-            <div className={styles.cardTrend}>
-              <ArrowUpRight size={14} />
-              <span>+8.3%</span>
-            </div>
-          </div>
-          <div className={styles.cardContent}>
-            <h3 className={styles.cardTitle}>Active Segments</h3>
-            <div className={styles.cardValue}>
-              {metrics.totalSegments.toLocaleString()}
-            </div>
-            <p className={styles.cardSubtitle}>Customer segments</p>
-          </div>
-          <div className={styles.cardSparkline}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendData.slice(-6)}>
-                <Line 
-                  type="monotone" 
-                  dataKey="segments" 
-                  stroke="#06d6a0" 
-                  strokeWidth={2} 
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        <KpiCard 
+          icon={Layers}
+          title="Active Segments"
+          value={metrics.totalSegments}
+          subtitle="Customer segments"
+          trend="+8.3%"
+          chartData={trendData}
+          chartType="line"
+          color="#06d6a0"
+          className={styles.accentCard}
+        />
 
-        <div className={`${styles.kpiCard} ${styles.infoCard}`}>
-          <div className={styles.cardHeader}>
-            <div className={styles.cardIcon}>
-              <Target size={24} />
-              <div className={styles.iconGlow}></div>
-            </div>
-          </div>
-          <div className={styles.cardContent}>
-            <h3 className={styles.cardTitle}>Avg. Segment Size</h3>
-            <div className={styles.cardValue}>
-              {metrics.totalSegments ? Math.round(metrics.totalProfiles / metrics.totalSegments).toLocaleString() : 0}
-            </div>
-            <p className={styles.cardSubtitle}>Profiles per segment</p>
-          </div>
-          <div className={styles.cardProgress}>
-            <div className={styles.progressBar}>
-              <div 
-                className={styles.progressFill}
-                style={{ width: `${Math.min(100, (metrics.totalProfiles / metrics.totalSegments) / 10)}%` }}
-              ></div>
-            </div>
-          </div>
-        </div>
+        <KpiCard 
+          icon={Target}
+          title="Avg. Segment Size"
+          value={metrics.totalSegments ? Math.round(metrics.totalProfiles / metrics.totalSegments) : 0}
+          subtitle="Profiles per segment"
+          chartType="progress"
+          color="#4cc9f0"
+          className={styles.infoCard}
+        />
 
-        <div className={`${styles.kpiCard} ${styles.successCard}`}>
-          <div className={styles.cardHeader}>
-            <div className={styles.cardIcon}>
-              <Shield size={24} />
-              <div className={styles.iconGlow}></div>
-            </div>
-          </div>
-          <div className={styles.cardContent}>
-            <h3 className={styles.cardTitle}>Data Quality</h3>
-            <div className={styles.cardValue}>
-              94<span className={styles.valueUnit}>%</span>
-            </div>
-            <p className={styles.cardSubtitle}>Excellent quality</p>
-          </div>
-          <div className={styles.cardGauge}>
-            <div className={styles.gaugeContainer}>
-              <svg viewBox="0 0 100 50" className={styles.gauge}>
-                <path 
-                  d="M10,40 A30,30 0 1,1 90,40"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.1)"
-                  strokeWidth="6"
-                />
-                <path 
-                  d="M10,40 A30,30 0 1,1 90,40"
-                  fill="none"
-                  stroke="#06d6a0"
-                  strokeWidth="6"
-                  strokeDasharray={`${94 * 1.26}, 126`}
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
+        <KpiCard 
+          icon={Shield}
+          title="Data Quality"
+          value={94}
+          subtitle="Excellent quality"
+          chartType="gauge"
+          color="#06d6a0"
+          className={styles.successCard}
+        />
       </div>
 
       {/* Quick Actions Panel */}
@@ -336,61 +416,33 @@ export default function DashboardPage() {
           </h2>
         </div>
         <div className={styles.actionGrid}>
-          <button 
-            className={styles.quickActionCard}
+          <QuickAction 
+            icon={Layers} 
+            title="Create Segment" 
+            description="Build a new customer segment" 
             onClick={() => handleQuickAction('create-segment')}
-          >
-            <div className={styles.actionIcon}>
-              <Layers size={20} />
-            </div>
-            <div className={styles.actionContent}>
-              <h3>Create Segment</h3>
-              <p>Build a new customer segment</p>
-            </div>
-            <ArrowRight size={16} className={styles.actionArrow} />
-          </button>
+          />
 
-          <button 
-            className={styles.quickActionCard}
+          <QuickAction 
+            icon={Database} 
+            title="Upload Profiles" 
+            description="Import customer data" 
             onClick={() => handleQuickAction('upload-profiles')}
-          >
-            <div className={styles.actionIcon}>
-              <Database size={20} />
-            </div>
-            <div className={styles.actionContent}>
-              <h3>Upload Profiles</h3>
-              <p>Import customer data</p>
-            </div>
-            <ArrowRight size={16} className={styles.actionArrow} />
-          </button>
+          />
 
-          <button 
-            className={styles.quickActionCard}
+          <QuickAction 
+            icon={Eye} 
+            title="View Segments" 
+            description="Browse all segments" 
             onClick={() => handleQuickAction('view-segments')}
-          >
-            <div className={styles.actionIcon}>
-              <Eye size={20} />
-            </div>
-            <div className={styles.actionContent}>
-              <h3>View Segments</h3>
-              <p>Browse all segments</p>
-            </div>
-            <ArrowRight size={16} className={styles.actionArrow} />
-          </button>
+          />
 
-          <button 
-            className={styles.quickActionCard}
+          <QuickAction 
+            icon={TrendingUp} 
+            title="Analytics" 
+            description="Deep dive insights" 
             onClick={() => handleQuickAction('analytics')}
-          >
-            <div className={styles.actionIcon}>
-              <TrendingUp size={20} />
-            </div>
-            <div className={styles.actionContent}>
-              <h3>Analytics</h3>
-              <p>Deep dive insights</p>
-            </div>
-            <ArrowRight size={16} className={styles.actionArrow} />
-          </button>
+          />
         </div>
       </div>
 
@@ -423,11 +475,11 @@ export default function DashboardPage() {
           <div className={styles.chartContainer}>
             {chartView === 'area' ? (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trendData}>
+                <AreaChart data={trendData} margin={{ top: 10, right: 10, bottom: 10, left: 0 }}>
                   <defs>
                     <linearGradient id="profileFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#7b61ff" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="#7b61ff" stopOpacity={0} />
+                      <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="segmentFill" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#06d6a0" stopOpacity={0.3} />
@@ -445,33 +497,32 @@ export default function DashboardPage() {
                     axisLine={false} 
                     tickLine={false}
                     tick={{ fill: 'rgba(255, 255, 255, 0.65)' }}
+                    width={40}
                   />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'rgba(26, 32, 53, 0.9)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '8px'
-                    }}
-                  />
+                  <Tooltip content={<CustomTooltip />} />
                   <Area 
                     type="monotone" 
                     dataKey="profiles" 
-                    stroke="#7b61ff" 
+                    name="Profiles"
+                    stroke="#8b5cf6" 
                     strokeWidth={2} 
                     fill="url(#profileFill)" 
+                    activeDot={{ r: 6, strokeWidth: 0, fill: '#8b5cf6' }}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="segments" 
+                    name="Segments"
                     stroke="#06d6a0" 
                     strokeWidth={2} 
                     fill="url(#segmentFill)"
+                    activeDot={{ r: 6, strokeWidth: 0, fill: '#06d6a0' }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={trendData}>
+                <BarChart data={trendData} margin={{ top: 10, right: 10, bottom: 10, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
                   <XAxis 
                     dataKey="name" 
@@ -483,10 +534,23 @@ export default function DashboardPage() {
                     axisLine={false} 
                     tickLine={false}
                     tick={{ fill: 'rgba(255, 255, 255, 0.65)' }}
+                    width={40}
                   />
-                  <Tooltip />
-                  <Bar dataKey="profiles" fill="#7b61ff" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="segments" fill="#06d6a0" radius={[4, 4, 0, 0]} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar 
+                    name="Profiles" 
+                    dataKey="profiles" 
+                    fill="#8b5cf6" 
+                    radius={[4, 4, 0, 0]}
+                    animationDuration={1500}
+                  />
+                  <Bar 
+                    name="Segments" 
+                    dataKey="segments" 
+                    fill="#06d6a0" 
+                    radius={[4, 4, 0, 0]}
+                    animationDuration={1500}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             )}

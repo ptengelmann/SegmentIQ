@@ -1,139 +1,173 @@
 // pages/analytics/AnalyticsPage.module.scss
-@import '../../styles/variables';
 
-// Color variables to match the app theme
+// Base variables
 $color-background: #0a0e17;
 $color-surface: #131827;
 $color-surface-alt: #1a2035;
 $color-surface-card: rgba(26, 32, 53, 0.7);
-$color-primary: #7b61ff;
+
+$color-primary: #8b5cf6;
 $color-primary-light: #9a85ff;
 $color-primary-dark: #5a3ff0;
 $color-accent: #06d6a0;
 $color-accent-light: #0ceeb1;
+$color-accent-dark: #04b58b;
+
 $color-text-primary: rgba(255, 255, 255, 0.95);
 $color-text-secondary: rgba(255, 255, 255, 0.65);
 $color-text-tertiary: rgba(255, 255, 255, 0.45);
+
 $color-border: rgba(255, 255, 255, 0.08);
-$color-success: #1ce8b5;
-$color-warning: #ffaa5a;
-$color-error: #ff5a5a;
+$color-glow: rgba(123, 97, 255, 0.3);
+
+$color-success: #06d6a0;
+$color-warning: #f59e0b;
+$color-error: #f72585;
 
 // Gradients
 $gradient-primary: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
-$gradient-accent: linear-gradient(135deg, $color-accent 0%, #04b58b 100%);
+$gradient-accent: linear-gradient(135deg, $color-accent 0%, $color-accent-dark 100%);
 $gradient-surface: linear-gradient(135deg, rgba(26, 32, 53, 0.7) 0%, rgba(17, 22, 38, 0.7) 100%);
 $gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
 
 // Shadows
-$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
-$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
-$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+$shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-primary: 0 0 20px rgba($color-primary, 0.3);
+$shadow-accent: 0 0 20px rgba($color-accent, 0.3);
+
+// Typography
+$font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+// Spacing
+$spacing-base: 4px;
+$spacing-xs: $spacing-base;
+$spacing-sm: $spacing-base * 2;
+$spacing-md: $spacing-base * 4;
+$spacing-lg: $spacing-base * 6;
+$spacing-xl: $spacing-base * 8;
+
+// Borders
+$border-radius-sm: 8px;
+$border-radius-md: 12px;
+$border-radius-lg: 16px;
+$border-radius-full: 9999px;
+
+// Animations
+$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+// Z-index
+$z-index-background: -1;
+$z-index-base: 1;
+$z-index-overlay: 10;
+$z-index-modal: 50;
+$z-index-tooltip: 100;
 
 // Main container
 .analyticsContainer {
-  padding: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  padding: $spacing-xl;
   color: $color-text-primary;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: $font-family-base;
+  overflow-x: hidden;
+  z-index: $z-index-base;
+  
+  // Subtle background grid pattern
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-// Loading state
-.loadingContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
+// Aurora Background Effect
+.auroraBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: $z-index-background;
   
-  p {
-    margin-top: 16px;
-    color: $color-text-secondary;
-    font-size: 16px;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: $color-background;
+    opacity: 0.85;
+    z-index: -1;
   }
 }
 
-.loadingSpinner {
-  width: 48px;
-  height: 48px;
-  border: 3px solid rgba($color-primary, 0.2);
-  border-top: 3px solid $color-primary;
+.aurora1, .aurora2, .aurora3 {
+  position: absolute;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  filter: blur(60px);
+  opacity: 0.4;
+  animation: floatAurora 20s infinite alternate ease-in-out;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.aurora1 {
+  top: 10%;
+  left: 20%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba($color-primary, 0.4) 0%, rgba($color-primary, 0) 70%);
+  animation-delay: -5s;
 }
 
-// Error state
-.errorContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  text-align: center;
-  padding: 32px;
-  
-  svg {
-    color: $color-error;
-    margin-bottom: 16px;
-  }
-  
-  h2 {
-    font-size: 24px;
-    font-weight: 600;
-    color: $color-text-primary;
-    margin: 0 0 8px;
-  }
-  
-  p {
-    color: $color-text-secondary;
-    margin: 0 0 24px;
-  }
+.aurora2 {
+  bottom: 20%;
+  right: 10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba($color-accent, 0.3) 0%, rgba($color-accent, 0) 70%);
+  animation-delay: -10s;
 }
 
-.retryButton {
-  display: flex;
-  align-items: center;
-  padding: 12px 24px;
-  background: $color-primary;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
-  
-  &:hover {
-    background: $color-primary-dark;
-    transform: translateY(-1px);
+.aurora3 {
+  top: 50%;
+  left: 50%;
+  width: 70vw;
+  height: 70vw;
+  background: radial-gradient(circle, rgba(76, 201, 240, 0.2) 0%, rgba(76, 201, 240, 0) 70%);
+  animation-delay: -15s;
+  animation-duration: 25s;
+}
+
+@keyframes floatAurora {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
   }
-  
-  svg {
-    margin-right: 8px;
+  100% {
+    transform: translate(2vw, 2vh) rotate(15deg) scale(1.1);
   }
 }
 
-// Header
+// Header Styles
 .analyticsHeader {
   display: flex;
   flex-direction: column;
-  margin-bottom: 32px;
+  margin-bottom: $spacing-xl;
   
   @media (min-width: 768px) {
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
   }
 }
 
 .headerLeft {
-  margin-bottom: 20px;
+  margin-bottom: $spacing-md;
   
   @media (min-width: 768px) {
     margin-bottom: 0;
@@ -141,21 +175,25 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
 .pageTitle {
-  display: flex;
-  align-items: center;
   font-size: 32px;
   font-weight: 700;
-  color: $color-text-primary;
-  margin: 0 0 8px;
+  margin: 0 0 $spacing-xs;
+  background: linear-gradient(90deg, $color-text-primary 0%, $color-primary-light 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: flex;
+  align-items: center;
+  letter-spacing: -0.02em;
   
-  svg {
-    margin-right: 12px;
+  .titleIcon {
+    margin-right: $spacing-sm;
     color: $color-primary-light;
   }
 }
 
 .pageSubtitle {
-  font-size: 16px;
+  font-size: 15px;
   color: $color-text-secondary;
   margin: 0;
   max-width: 600px;
@@ -164,22 +202,37 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
 .headerControls {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
+  gap: $spacing-sm;
+  
+  @media (min-width: 640px) {
+    flex-wrap: nowrap;
+  }
+}
+
+// Time Range Controls
+.timeRangeWrapper {
+  position: relative;
 }
 
 .timeRangeSelector {
   display: flex;
   align-items: center;
-  background: $color-surface-alt;
+  background: rgba($color-surface-alt, 0.5);
   border: 1px solid $color-border;
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: $border-radius-md;
+  padding: $spacing-sm $spacing-md;
+  backdrop-filter: blur(10px);
+  transition: all $transition-normal;
   
-  svg {
-    margin-right: 8px;
-    color: $color-text-tertiary;
+  &:hover {
+    border-color: rgba($color-primary, 0.4);
+    box-shadow: 0 0 0 1px rgba($color-primary, 0.1);
   }
+}
+
+.controlIcon {
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
 }
 
 .timeSelect, .metricSelect {
@@ -187,37 +240,49 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
   border: none;
   color: $color-text-secondary;
   font-size: 14px;
+  padding-right: 20px;
+  appearance: none;
   cursor: pointer;
+  outline: none;
   font-family: inherit;
   
+  // Custom dropdown arrow
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255, 255, 255, 0.45)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 16px;
+  
   &:focus {
-    outline: none;
     color: $color-text-primary;
   }
   
   option {
-    background: $color-surface;
+    background-color: $color-surface;
     color: $color-text-primary;
   }
 }
 
+// Action Buttons
 .actionButton {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
-  background: $color-surface-alt;
+  background: rgba($color-surface-alt, 0.5);
   border: 1px solid $color-border;
-  border-radius: 8px;
+  border-radius: $border-radius-md;
+  padding: $spacing-sm $spacing-md;
   color: $color-text-secondary;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all $transition-normal;
   font-family: inherit;
+  backdrop-filter: blur(10px);
   
   &:hover:not(:disabled) {
-    background: rgba($color-surface-alt, 0.8);
+    background: rgba($color-surface-alt, 0.7);
     border-color: rgba($color-primary, 0.3);
     color: $color-text-primary;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
   
   &:disabled {
@@ -225,21 +290,32 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
     cursor: not-allowed;
   }
   
-  svg {
-    margin-right: 8px;
-    
-    &.spinning {
+  span {
+    margin-left: $spacing-sm;
+  }
+  
+  &.refreshing {
+    .spinning {
       animation: spin 1s linear infinite;
     }
   }
 }
 
-// KPI Section
-.kpiSection {
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// KPI Grid
+.kpiGrid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  gap: 20px;
-  margin-bottom: 32px;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
   
   @media (min-width: 640px) {
     grid-template-columns: repeat(2, 1fr);
@@ -250,99 +326,261 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
   }
 }
 
+// KPI Card Styles
 .kpiCard {
-  background: $color-surface-card;
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid $color-border;
-  backdrop-filter: blur(10px);
   position: relative;
-  transition: all 0.3s ease;
+  min-height: 160px;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition: all $transition-normal;
   
-  &::before {
-    content: '';
+  // Glass morphism effect
+  background: rgba($color-surface-card, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba($color-border, 0.7);
+  
+  // Card accent colors
+  &.primaryCard {
+    --card-color: #{$color-primary};
+  }
+  
+  &.accentCard {
+    --card-color: #{$color-accent};
+  }
+  
+  &.infoCard {
+    --card-color: #4cc9f0;
+  }
+  
+  &.successCard {
+    --card-color: #{$color-success};
+  }
+  
+  &.warningCard {
+    --card-color: #{$color-warning};
+  }
+  
+  // Card border glow on hover
+  &::after {
+    content: "";
     position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    background: $gradient-glass;
-    z-index: -1;
-    opacity: 0.5;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--card-color, $color-primary);
+    opacity: 0.7;
+    transition: all $transition-normal;
   }
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
-    border-color: rgba($color-primary, 0.3);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    border-color: rgba(var(--card-color, $color-primary), 0.3);
+    
+    &::after {
+      height: 3px;
+      opacity: 1;
+      box-shadow: 0 0 15px 1px var(--card-color, $color-primary);
+    }
+    
+    .cardIcon {
+      transform: scale(1.05);
+      
+      .iconGlow {
+        opacity: 1;
+        transform: scale(1.4);
+      }
+    }
+    
+    .cardSparkline, .cardProgress, .cardGauge {
+      transform: scale(1.02);
+    }
+  }
+  
+  // Subtle animated gradient background for cards
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+      90deg, 
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.04) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 5s infinite linear;
+    z-index: -1;
   }
 }
 
-.kpiHeader {
+@keyframes shimmer {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.cardIcon {
+  position: relative;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  justify-content: center;
+  border-radius: $border-radius-md;
+  margin-bottom: $spacing-sm;
+  transition: transform $transition-normal;
   
   svg {
-    margin-right: 8px;
-    color: $color-primary-light;
-  }
-  
-  span {
-    font-size: 14px;
-    font-weight: 500;
-    color: $color-text-secondary;
+    position: relative;
+    z-index: 1;
+    color: var(--card-color, $color-primary);
   }
 }
 
-.kpiValue {
-  font-size: 28px;
+.iconGlow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: $border-radius-md;
+  background: rgba(var(--card-color, $color-primary), 0.15);
+  filter: blur(8px);
+  opacity: 0.7;
+  z-index: 0;
+  transition: all $transition-normal;
+}
+
+.cardContent {
+  margin-bottom: $spacing-md;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text-secondary;
+  margin: 0 0 $spacing-xs;
+}
+
+.cardValue {
+  font-size: 30px;
   font-weight: 700;
   color: $color-text-primary;
-  margin-bottom: 8px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
-.kpiTrend {
+.valueUnit {
+  font-size: 16px;
+  color: $color-text-secondary;
+  margin-left: 2px;
+}
+
+.cardTrend {
   display: flex;
   align-items: center;
-  font-size: 14px;
+  margin-top: $spacing-xs;
   color: $color-success;
+  font-size: 13px;
+  font-weight: 500;
   
   svg {
     margin-right: 4px;
   }
 }
 
-// Analytics Grid
+.cardSparkline {
+  height: 40px;
+  margin-top: auto;
+  transition: transform $transition-slow;
+}
+
+// Progress Bar
+.cardProgress {
+  margin-top: auto;
+  transition: transform $transition-slow;
+}
+
+.progressBar {
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: $border-radius-full;
+  overflow: hidden;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 2s infinite;
+  }
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-primary, $color-primary-light);
+  border-radius: $border-radius-full;
+  transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+// Gauge
+.cardGauge {
+  margin-top: auto;
+  height: 50px;
+  transition: transform $transition-slow;
+}
+
+.gaugeContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.gauge {
+  width: 100%;
+  height: 100%;
+}
+
+// Charts Grid
 .analyticsGrid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  gap: 24px;
-  margin-bottom: 32px;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xl;
   
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
   }
-  
-  @media (min-width: 1200px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 
 .chartCard {
-  background: $color-surface-card;
-  border-radius: 16px;
-  padding: 24px;
+  padding: $spacing-lg;
+  background: rgba($color-surface-card, 0.6);
+  backdrop-filter: blur(12px);
+  border-radius: $border-radius-lg;
   border: 1px solid $color-border;
-  backdrop-filter: blur(10px);
-  position: relative;
+  transition: all $transition-normal;
   
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 16px;
-    background: $gradient-glass;
-    z-index: -1;
-    opacity: 0.5;
+  &:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    border-color: rgba($color-primary, 0.2);
+    
+    .cardHeader h3 {
+      background-position: left bottom;
+    }
   }
   
   &.fullWidth {
@@ -354,8 +592,8 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-sm;
   border-bottom: 1px solid $color-border;
   
   h3 {
@@ -363,17 +601,24 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
     font-weight: 600;
     color: $color-text-primary;
     margin: 0;
+    position: relative;
+    background: linear-gradient(to right, $color-text-primary 0%, $color-primary-light 100%);
+    background-size: 200% 100%;
+    background-position: right bottom;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: all 0.5s ease;
   }
+}
+
+.cardControls {
+  display: flex;
+  align-items: center;
   
   svg {
     color: $color-text-tertiary;
   }
-}
-
-.chartControls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .chartContainer {
@@ -385,14 +630,16 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
 .funnelContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 20px 0;
+  gap: $spacing-md;
+  padding: $spacing-lg 0;
+  overflow-y: auto;
+  max-height: 300px;
 }
 
 .funnelStage {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: $spacing-md;
 }
 
 .funnelBar {
@@ -400,13 +647,43 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
   justify-content: space-between;
   align-items: center;
   height: 40px;
-  padding: 0 16px;
-  border-radius: 8px;
-  min-width: 200px;
-  transition: all 0.3s ease;
+  padding: 0 $spacing-md;
+  border-radius: $border-radius-md;
+  min-width: 40%;
+  transition: all $transition-normal;
+  position: relative;
+  overflow: hidden;
   
   &:hover {
     transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  // Shimmer effect
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+      90deg, 
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-100%);
+    animation: shimmerFunnel 3s infinite;
+  }
+}
+
+@keyframes shimmerFunnel {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(50%);
   }
 }
 
@@ -423,31 +700,40 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
 .funnelPercentage {
-  font-size: 12px;
+  font-size: 13px;
   color: $color-text-tertiary;
-  min-width: 50px;
+  min-width: 60px;
   text-align: right;
+  padding-right: $spacing-sm;
+  transition: color $transition-normal;
+  
+  &:hover {
+    color: $color-text-primary;
+  }
 }
 
 // Geographic styles
 .geoContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: $spacing-sm;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: $spacing-sm;
 }
 
 .geoItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
+  padding: $spacing-md;
   background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: $border-radius-md;
+  border: 1px solid transparent;
+  transition: all $transition-normal;
   
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateX(4px);
+    border-color: rgba($color-primary, 0.2);
   }
 }
 
@@ -457,13 +743,14 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
 .geoName {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: $color-text-primary;
+  margin-bottom: 2px;
 }
 
 .geoUsers {
-  font-size: 12px;
+  font-size: 13px;
   color: $color-text-tertiary;
 }
 
@@ -474,13 +761,16 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
 .geoRevenue {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: $color-text-primary;
+  margin-bottom: 2px;
 }
 
 .geoGrowth {
-  font-size: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
   font-weight: 500;
   
   &.positive {
@@ -490,11 +780,15 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
   &.negative {
     color: $color-error;
   }
+  
+  svg {
+    margin-right: 2px;
+  }
 }
 
 // Insights Section
 .insightsSection {
-  margin-top: 32px;
+  margin-top: $spacing-xl;
 }
 
 .insightsTitle {
@@ -503,10 +797,10 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
   font-size: 24px;
   font-weight: 600;
   color: $color-text-primary;
-  margin: 0 0 24px;
+  margin: 0 0 $spacing-lg;
   
-  svg {
-    margin-right: 12px;
+  .titleIcon {
+    margin-right: $spacing-sm;
     color: $color-primary-light;
   }
 }
@@ -514,13 +808,9 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
 .insightsGrid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  gap: 20px;
+  gap: $spacing-lg;
   
   @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  @media (min-width: 1024px) {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -528,66 +818,388 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
 .insightCard {
   display: flex;
   align-items: flex-start;
-  padding: 20px;
-  background: $color-surface-card;
-  border-radius: 12px;
+  padding: $spacing-lg;
+  background: rgba($color-surface-card, 0.6);
+  border-radius: $border-radius-lg;
   border: 1px solid $color-border;
-  backdrop-filter: blur(10px);
-  position: relative;
-  transition: all 0.3s ease;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    background: $gradient-glass;
-    z-index: -1;
-    opacity: 0.5;
-  }
+  backdrop-filter: blur(12px);
+  transition: all $transition-normal;
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
     border-color: rgba($color-primary, 0.3);
+    
+    .insightIcon {
+      transform: scale(1.1);
+      background: rgba($color-primary, 0.2);
+    }
   }
 }
 
 .insightIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: $border-radius-md;
   background: rgba($color-primary, 0.1);
   color: $color-primary-light;
-  margin-right: 16px;
+  margin-right: $spacing-md;
   flex-shrink: 0;
+  transition: all $transition-normal;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: $border-radius-md;
+    background: inherit;
+    filter: blur(8px);
+    opacity: 0.5;
+    z-index: -1;
+  }
 }
 
 .insightContent {
   flex: 1;
   
   h4 {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     color: $color-text-primary;
-    margin: 0 0 8px;
+    margin: 0 0 $spacing-sm;
+    background: linear-gradient(90deg, $color-text-primary 0%, $color-primary-light 100%);
+    background-size: 200% 100%;
+    background-position: left;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
   }
   
   p {
     font-size: 14px;
     color: $color-text-secondary;
-    line-height: 1.5;
+    line-height: 1.6;
     margin: 0;
   }
 }
 
-// Responsive adjustments
+// Custom Tooltip
+.customTooltip {
+  background: rgba($color-surface-alt, 0.95);
+  border: 1px solid rgba($color-border, 0.7);
+  border-radius: $border-radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-md;
+  backdrop-filter: blur(10px);
+}
+
+.tooltipLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-sm;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: $spacing-sm;
+}
+
+.tooltipItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.tooltipMarker {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: $spacing-sm;
+}
+
+.tooltipName {
+  font-size: 12px;
+  color: $color-text-secondary;
+  margin-right: $spacing-xs;
+}
+
+.tooltipValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+// Loading state
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+.loadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: $z-index-base;
+}
+
+.loadingSpinner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.spinnerRing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: $color-primary;
+  animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    border: 3px solid transparent;
+  }
+  
+  &::before {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border-top-color: $color-accent;
+    animation: spin 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
+  }
+  
+  &::after {
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    border-top-color: $color-primary-light;
+    animation: spin 1.4s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  }
+}
+
+.spinnerCore {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: radial-gradient(circle, $color-primary-light 0%, $color-primary 100%);
+  opacity: 0.8;
+  animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.9;
+  }
+}
+
+.loadingText {
+  margin-top: $spacing-lg;
+  font-size: 16px;
+  font-weight: 500;
+  color: $color-text-secondary;
+  display: flex;
+  align-items: center;
+}
+
+.loadingDot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: linear-gradient(to right, $color-primary, $color-primary-light);
+  margin: 0 4px;
+  opacity: 0;
+  animation: dotFade 1.4s infinite ease-in-out;
+  
+  &:nth-child(1) {
+    animation-delay: 0s;
+  }
+  
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  &:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+}
+
+@keyframes dotFade {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Error state
+.errorContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+.errorContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba($color-error, 0.05);
+  border: 1px solid rgba($color-error, 0.2);
+  border-radius: $border-radius-lg;
+  padding: $spacing-xl;
+  margin: $spacing-xl 0;
+  text-align: center;
+  max-width: 500px;
+  backdrop-filter: blur(10px);
+  
+  // Pulsing glow effect
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 0 30px rgba($color-error, 0.2);
+    animation: errorPulse 2s infinite ease-in-out;
+    z-index: -1;
+  }
+}
+
+@keyframes errorPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.errorIcon {
+  color: $color-error;
+  margin-bottom: $spacing-md;
+  position: relative;
+  
+  .iconPulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba($color-error, 0.2);
+    z-index: -1;
+    animation: iconPulse 2s infinite;
+  }
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.errorTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-sm;
+}
+
+.errorText {
+  font-size: 15px;
+  color: $color-text-secondary;
+  margin: 0 0 $spacing-lg;
+}
+
+.retryButton {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  background: $color-primary;
+  border: none;
+  border-radius: $border-radius-md;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-normal;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+  
+  &:hover {
+    background: $color-primary-dark;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba($color-primary, 0.4);
+  }
+  
+  svg {
+    margin-right: $spacing-sm;
+  }
+}
+
+// Enhanced Chart Styling
+.chartContainer {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30%;
+    background: linear-gradient(to top, rgba($color-surface-alt, 0.2), transparent);
+    border-radius: 0 0 $border-radius-md $border-radius-md;
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+// Responsive Design
 @media (max-width: 768px) {
   .analyticsContainer {
-    padding: 16px;
+    padding: $spacing-md;
   }
   
   .pageTitle {
@@ -598,155 +1210,83 @@ $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
     font-size: 14px;
   }
   
-  .kpiSection {
-    gap: 16px;
+  .kpiGrid {
+    gap: $spacing-sm;
   }
   
   .kpiCard {
-    padding: 16px;
+    padding: $spacing-md;
   }
   
-  .kpiValue {
+  .cardValue {
     font-size: 24px;
   }
   
   .analyticsGrid {
-    gap: 16px;
+    gap: $spacing-md;
   }
   
   .chartCard {
-    padding: 20px;
+    padding: $spacing-md;
   }
   
   .chartContainer {
     height: 250px;
   }
   
-  .funnelBar {
-    min-width: 150px;
-    height: 35px;
-    padding: 0 12px;
-  }
-  
-  .funnelLabel, .funnelValue {
-    font-size: 12px;
+  .insightsTitle {
+    font-size: 20px;
   }
   
   .insightCard {
-    padding: 16px;
+    padding: $spacing-md;
   }
   
   .insightIcon {
-    width: 36px;
-    height: 36px;
-    margin-right: 12px;
-  }
-}
-
-// Animation utilities
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-// Add subtle animations
-.kpiCard {
-  animation: fadeInUp 0.5s ease-out;
-  
-  &:nth-child(1) { animation-delay: 0.1s; }
-  &:nth-child(2) { animation-delay: 0.2s; }
-  &:nth-child(3) { animation-delay: 0.3s; }
-  &:nth-child(4) { animation-delay: 0.4s; }
-}
-
-.chartCard {
-  animation: fadeInUp 0.6s ease-out;
-  
-  &:nth-child(1) { animation-delay: 0.2s; }
-  &:nth-child(2) { animation-delay: 0.3s; }
-  &:nth-child(3) { animation-delay: 0.4s; }
-  &:nth-child(4) { animation-delay: 0.5s; }
-}
-
-.insightCard {
-  animation: slideInRight 0.5s ease-out;
-  
-  &:nth-child(1) { animation-delay: 0.1s; }
-  &:nth-child(2) { animation-delay: 0.2s; }
-  &:nth-child(3) { animation-delay: 0.3s; }
-}
-
-// Custom scrollbar for overflow areas
-.geoContainer, .funnelContainer {
-  &::-webkit-scrollbar {
-    width: 4px;
+    width: 40px;
+    height: 40px;
   }
   
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-  }
-  
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.15);
+  .insightContent h4 {
+    font-size: 16px;
   }
 }
 
-// Loading states for charts
-.chartContainer {
-  position: relative;
-  
-  &.loading {
-    &::after {
-      content: 'Loading chart data...';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: $color-text-tertiary;
-      font-size: 14px;
-    }
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+// For Firefox
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) rgba(255, 255, 255, 0.03);
+}
+
+// Custom glassmorphism styles for chart elements
+tspan {
+  fill: $color-text-secondary;
+}
+
+// Utility class for a clean focus ring
+.focusRing {
+  &:focus {
+    outline: 2px solid rgba($color-primary, 0.5);
+    outline-offset: 2px;
   }
-}
-
-// Enhanced hover effects
-.funnelStage:hover .funnelBar {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.geoItem:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-// Focus states for accessibility
-.timeSelect:focus,
-.metricSelect:focus {
-  outline: 2px solid rgba($color-primary, 0.5);
-  outline-offset: 2px;
-}
-
-.actionButton:focus {
-  outline: 2px solid rgba($color-primary, 0.5);
-  outline-offset: 2px;
 }
